@@ -33,7 +33,7 @@ io.on('connection', (socket) => {
         if (game.in_checkmate()) {
             io.to(room).emit('gameOver', game.turn(), true)
         }
-        // draw? 
+        // draw?
         else if (game.in_draw()) {
             io.to(room).emit('gameOver', game.turn(), false)
         }
