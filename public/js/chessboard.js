@@ -15,20 +15,26 @@
   // Constants
   // ---------------------------------------------------------------------------
 
-  var COLUMNS = 'abcdefgh'.split('')
-  var DEFAULT_DRAG_THROTTLE_RATE = 20
-  var ELLIPSIS = '…'
-  var MINIMUM_JQUERY_VERSION = '1.8.3'
-  var RUN_ASSERTS = false
-  var START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
-  var START_POSITION = fenToObj(START_FEN)
+
+  const NUM_ROWS = 16;
+  const NUM_COLS = 16;
+
+  console.assert(NUM_COLS <= 26);
+
+  const COLUMN_IDS = 'abcdefghijklmnopqrstuvwxyz'.split('').splice(0, NUM_COLS);
+  const DEFAULT_DRAG_THROTTLE_RATE = 20
+  const ELLIPSIS = '…'
+  const MINIMUM_JQUERY_VERSION = '1.8.3'
+  const RUN_ASSERTS = false
+  const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
+  const START_POSITION = fenToObj(START_FEN)
 
   // default animation speeds
-  var DEFAULT_APPEAR_SPEED = 200
-  var DEFAULT_MOVE_SPEED = 200
-  var DEFAULT_SNAPBACK_SPEED = 60
-  var DEFAULT_SNAP_SPEED = 30
-  var DEFAULT_TRASH_SPEED = 100
+  const DEFAULT_APPEAR_SPEED = 200
+  const DEFAULT_MOVE_SPEED = 200
+  const DEFAULT_SNAPBACK_SPEED = 60
+  const DEFAULT_SNAP_SPEED = 30
+  const DEFAULT_TRASH_SPEED = 100
 
   // use unique class names to prevent clashing with anything else on the page
   // and simplify selectors
@@ -191,7 +197,7 @@
   }
 
   function validSquare (square) {
-    return isString(square) && square.search(/^[a-h][1-8]$/) !== -1
+    return isString(square) && square.search(/^[a-z][1-9][0-9]*$/) !== -1
   }
 
   if (RUN_ASSERTS) {
@@ -351,7 +357,7 @@
           colIdx = colIdx + numEmptySquares
         } else {
           // piece
-          var square = COLUMNS[colIdx] + currentRow
+          var square = COLUMN_IDS[colIdx] + currentRow
           position[square] = fenToPieceCode(row[j])
           colIdx = colIdx + 1
         }
@@ -373,7 +379,7 @@
     var currentRow = 8
     for (var i = 0; i < 8; i++) {
       for (var j = 0; j < 8; j++) {
-        var square = COLUMNS[j] + currentRow
+        var square = COLUMN_IDS[j] + currentRow
 
         // piece exists
         if (obj.hasOwnProperty(square)) {
@@ -426,11 +432,11 @@
   // returns the distance between two squares
   function squareDistance (squareA, squareB) {
     var squareAArray = squareA.split('')
-    var squareAx = COLUMNS.indexOf(squareAArray[0]) + 1
+    var squareAx = COLUMN_IDS.indexOf(squareAArray[0]) + 1
     var squareAy = parseInt(squareAArray[1], 10)
 
     var squareBArray = squareB.split('')
-    var squareBx = COLUMNS.indexOf(squareBArray[0]) + 1
+    var squareBx = COLUMN_IDS.indexOf(squareBArray[0]) + 1
     var squareBy = parseInt(squareBArray[1], 10)
 
     var xDelta = Math.abs(squareAx - squareBx)
@@ -463,9 +469,9 @@
     var squares = []
 
     // calculate distance of all squares
-    for (var i = 0; i < 8; i++) {
-      for (var j = 0; j < 8; j++) {
-        var s = COLUMNS[i] + (j + 1)
+    for (var i = 0; i < NUM_COLS; i++) {
+      for (var j = 0; j < NUM_ROWS; j++) {
+        var s = COLUMN_IDS[i] + (j + 1)
 
         // skip the square we're starting from
         if (square === s) continue
@@ -765,19 +771,19 @@
       // pad one pixel
       var boardWidth = containerWidth - 1
 
-      while (boardWidth % 8 !== 0 && boardWidth > 0) {
+      while (boardWidth % NUM_COLS !== 0 && boardWidth > 0) {
         boardWidth = boardWidth - 1
       }
 
-      return boardWidth / 8
+      return boardWidth / NUM_COLS
     }
 
     // create random IDs for elements
     function createElIds () {
       // squares on the board
-      for (var i = 0; i < COLUMNS.length; i++) {
-        for (var j = 1; j <= 8; j++) {
-          var square = COLUMNS[i] + j
+      for (var i = 0; i < COLUMN_IDS.length; i++) {
+        for (var j = 1; j <= NUM_ROWS; j++) {
+          var square = COLUMN_IDS[i] + j
           squareElsIds[square] = square + '-' + uuid()
         }
       }
@@ -804,17 +810,17 @@
       var html = ''
 
       // algebraic notation / orientation
-      var alpha = deepCopy(COLUMNS)
-      var row = 8
+      var alpha = deepCopy(COLUMN_IDS)
+      var row = NUM_ROWS
       if (orientation === 'black') {
         alpha.reverse()
         row = 1
       }
 
       var squareColor = 'white'
-      for (var i = 0; i < 8; i++) {
+      for (var i = 0; i < NUM_ROWS; i++) {
         html += '<div class="{row}">'
-        for (var j = 0; j < 8; j++) {
+        for (var j = 0; j < NUM_COLS; j++) {
           var square = alpha[j] + row
 
           html += '<div class="{square} ' + CSS[squareColor] + ' ' +
@@ -826,7 +832,7 @@
           if (config.showNotation) {
             // alpha notation
             if ((orientation === 'white' && row === 1) ||
-                (orientation === 'black' && row === 8)) {
+                (orientation === 'black' && row === NUM_ROWS)) {
               html += '<div class="{notation} {alpha}">' + alpha[j] + '</div>'
             }
 
@@ -1556,7 +1562,7 @@
       squareSize = calculateSquareSize()
 
       // set board width
-      $board.css('width', squareSize * 8 + 'px')
+      $board.css('width', squareSize * NUM_COLS + 'px')
 
       // set drag piece size
       $draggedPiece.css({

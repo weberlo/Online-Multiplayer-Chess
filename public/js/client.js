@@ -268,7 +268,7 @@ joinButtonEl.addEventListener('click', (e) => {
         formEl[0].setAttribute("disabled", "disabled")
         document.querySelector('#roomDropdownP').style.display = 'none';
         formEl[1].setAttribute("disabled", "disabled")
-        //Now Let's try to join it in room // If users more than 2 we will 
+        //Now Let's try to join it in room // If users more than 2 we will
         socket.emit('joinRoom', { user, room }, (error) => {
             messageEl.textContent = error
             if (alert(error)) {
