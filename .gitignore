@@ -1,1 +1,4 @@
-node_modules
+# NOTE: we don't put node_modules in the gitignore because downloading them on
+# athena is running into cert issues
+#
+# node_modules
