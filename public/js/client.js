@@ -65,17 +65,19 @@ function makeRandomMove() {
     board.position(game.currentPosition());
 }
 
-function onDrop2(source, target) {
+function squareAsArr(square) {
     // NOTE for whatever reasoning, the map is generating a NaN, so we unfold
     // it manually below
     // move.from = move.from.split('-').map(parseInt);
-    source = source.split('-');
-    source[0] = parseInt(source[0]);
-    source[1] = parseInt(source[1]);
+    let arr = square.split('-');
+    arr[0] = parseInt(arr[0]);
+    arr[1] = parseInt(arr[1]);
+    return arr;
+}
 
-    target = target.split('-');
-    target[0] = parseInt(target[0]);
-    target[1] = parseInt(target[1]);
+function onDrop2(source, target) {
+    source = squareAsArr(source);
+    target = squareAsArr(target);
 
     // see if the move is legal
     var move = game.move({
@@ -116,6 +118,9 @@ const socket = io()
 
 //Triggers after a piece is dropped on the board
 function onDrop(source, target) {
+    source = squareAsArr(source);
+    target = squareAsArr(target);
+
     //emits event after piece is dropped
     var room = formEl[1].value;
     myAudioEl.play();
@@ -134,8 +139,7 @@ socket.on('printing', (fen) => {
 })
 
 //Catch Display event
-socket.on('DisplayBoard', (fenString, userId, pgn) => {
-    console.log(fenString)
+socket.on('DisplayBoard', (position, userId) => {
     //This is to be done initially only
     if (userId != undefined) {
         messageEl.textContent = 'Match Started!! Best of Luck...'
@@ -148,9 +152,9 @@ socket.on('DisplayBoard', (fenString, userId, pgn) => {
         document.getElementById('statusPGN').style.display = null
     }
 
-    config.position = fenString
+    config.position = 'start'
     board = ChessBoard('myBoard', config)
-    document.getElementById('pgn').textContent = pgn
+    board.position(position);
 })
 
 //To turn off dragging
@@ -298,13 +302,13 @@ multiPlayerEl.addEventListener('click', (e) => {
     document.getElementById('gameMode').style.display = "none";
     //Server will create a game and clients will play it
     //Clients just have to diaplay the game
-    var board = ChessBoard('myBoard')
     config = {
         draggable: false,   //Initially
         position: 'start',
         onDrop: onDrop,
         orientation: 'white'
     }
+    // var board = ChessBoard('myBoard', config)
 })
 
 const applyColorScheme = (black, white) => {
