@@ -356,11 +356,11 @@
     // default for dropOffBoard is 'snapback'
     if (config.dropOffBoard !== 'trash') config.dropOffBoard = 'snapback'
 
-    // default piece theme is wikipedia
-    if (!config.hasOwnProperty('pieceTheme') ||
-        (!isString(config.pieceTheme) && !isFunction(config.pieceTheme))) {
-      config.pieceTheme = 'img/chesspieces/wikipedia/{piece}.png'
-    }
+    // // default piece theme is wikipedia
+    // if (!config.hasOwnProperty('pieceTheme') ||
+    //     (!isString(config.pieceTheme) && !isFunction(config.pieceTheme))) {
+    //   config.pieceTheme = 'img/chesspieces/wikipedia/{piece}.png'
+    // }
 
     // animation speeds
     if (!validAnimationSpeed(config.appearSpeed)) config.appearSpeed = DEFAULT_APPEAR_SPEED
@@ -603,21 +603,8 @@
     }
 
     function buildPieceImgSrc (piece) {
-      if (piece.search(/^[a-z][0-9]$/) !== -1) {
-        piece = (piece[1] == 0 ? 'w' : 'b') + piece[0].toUpperCase();
-      }
-
-      if (isFunction(config.pieceTheme)) {
-        return config.pieceTheme(piece)
-      }
-
-      if (isString(config.pieceTheme)) {
-        return interpolateTemplate(config.pieceTheme, {piece: piece})
-      }
-
-      // NOTE: this should never happen
-      error(8272, 'Unable to build image source for config.pieceTheme.')
-      return ''
+      let [type, player] = piece.split('')
+      return 'img/chesspieces/' + player + '/' + type +'.png'
     }
 
     function buildPieceHTML (piece, hidden, id) {
@@ -1370,7 +1357,7 @@
 
       // create the drag piece
       var draggedPieceId = uuid()
-      $('body').append(buildPieceHTML('wP', true, draggedPieceId))
+      $('body').append(buildPieceHTML('p0', true, draggedPieceId))
       $draggedPiece = $('#' + draggedPieceId)
 
       // TODO: need to remove this dragged piece element if the board is no

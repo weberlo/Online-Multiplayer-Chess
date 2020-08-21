@@ -105,6 +105,7 @@ singlePlayerEl.addEventListener('click', (e) => {
     config = {
         draggable: true,
         position: 'start',
+        player: 0,
         onDragStart: onDragStart2,
         onDrop: onDrop2,
         onSnapEnd: onSnapEnd2
@@ -170,10 +171,10 @@ socket.on('Dragging', id => {
 //To Update Status Element
 socket.on('updateStatus', (turn) => {
     if (turn == board.player()) {
-        statusEl.textContent = "Your turn"
+        statusEl.innerHTML = "Your turn"
     }
     else {
-        statusEl.textContent = "Player " + board.player() + "'s turn"
+        statusEl.innerHTML = "Player " + turn + "'s turn (<img src='img/chesspieces/" + turn + "/k.png' width='25px' height='25px' />)"
     }
 })
 
