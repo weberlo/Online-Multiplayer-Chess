@@ -1340,29 +1340,30 @@
         return deepCopy(currentPosition)
       }
 
-      // get position as FEN
-      if (isString(position) && position.toLowerCase() === 'fen') {
-        return objToFen(currentPosition)
-      }
+      // // get position as FEN
+      // if (isString(position) && position.toLowerCase() === 'fen') {
+      //   return objToFen(currentPosition)
+      // }
 
       // start position
       if (isString(position) && position.toLowerCase() === 'start') {
         position = deepCopy(START_POSITION)
       }
 
-      // convert FEN to position object
-      if (validFen(position)) {
-        position = fenToObj(position)
-      }
+      // // convert FEN to position object
+      // if (validFen(position)) {
+      //   position = fenToObj(position)
+      // }
 
-      // validate position object
-      if (!validPositionObject(position)) {
-        error(6482, 'Invalid value passed to the position method.', position)
-        return
-      }
+      // // validate position object
+      // if (!validPositionObject(position)) {
+      //   error(6482, 'Invalid value passed to the position method.', position)
+      //   return
+      // }
 
       // default for useAnimations is true
-      if (useAnimation !== false) useAnimation = true
+      // if (useAnimation !== false) useAnimation = true
+      useAnimation = false
 
       if (useAnimation) {
         // start the animations

@@ -46,8 +46,8 @@ function onDragStart2(source, piece, position, orientation) {
         return false
     }
 
-    // only pick up pieces for White
-    if (piece.search(/^b/) !== -1) return false
+    // // only pick up pieces for White
+    // if (piece.search(/0$/) !== -1) return false
 }
 
 function makeRandomMove() {
@@ -62,10 +62,21 @@ function makeRandomMove() {
     game.move(possibleMoves[randomIdx]);
     myAudioEl.play();
     turnt = 1 - turnt;
-    board.position(game.fen());
+    board.position(game.currentPosition());
 }
 
 function onDrop2(source, target) {
+    // NOTE for whatever reasoning, the map is generating a NaN, so we unfold
+    // it manually below
+    // move.from = move.from.split('-').map(parseInt);
+    source = source.split('-');
+    source[0] = parseInt(source[0]);
+    source[1] = parseInt(source[1]);
+
+    target = target.split('-');
+    target[0] = parseInt(target[0]);
+    target[1] = parseInt(target[1]);
+
     // see if the move is legal
     var move = game.move({
         from: source,
@@ -83,7 +94,7 @@ function onDrop2(source, target) {
 // update the board position after the piece snap
 // for castling, en passant, pawn promotion
 function onSnapEnd2() {
-    board.position(game.fen())
+    board.position(game.currentPosition())
 }
 
 singlePlayerEl.addEventListener('click', (e) => {
@@ -93,9 +104,9 @@ singlePlayerEl.addEventListener('click', (e) => {
     config = {
         draggable: true,
         position: 'start',
-        // onDragStart: onDragStart2,
-        // onDrop: onDrop2,
-        // onSnapEnd: onSnapEnd2
+        onDragStart: onDragStart2,
+        onDrop: onDrop2,
+        onSnapEnd: onSnapEnd2
     }
     board = Chessboard('myBoard', config);
 })
