@@ -105,10 +105,6 @@ io.on('connection', (socket) => {
             to: target,
             promotion: 'q' // NOTE: always promote to a queen for example simplicity
         })
-        console.log('WEEEEEE');
-        console.log(source);
-        console.log(target);
-        console.log(move);
         // If correct move, then toggle the turns
         if (move != null) {
             io.to(room).emit('Dragging', socket.id)

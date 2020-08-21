@@ -15,40 +15,37 @@
   // Constants
   // ---------------------------------------------------------------------------
 
-  const START_POSITION = [
-    ['r0', 'n0', 'b0', 'q0', 'k0', 'b0', 'n0', 'r0'],
-    ['p0', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0'],
-    ['',    '',   '',   '',   '',   '',   '',   ''],
-    ['',    '',   '',   '',   '',   '',   '',   ''],
-    ['',    '',   '',   '',   '',   '',   '',   ''],
-    ['',    '',   '',   '',   '',   '',   '',   ''],
-    ['p1', 'p1', 'p1', 'p1', 'p1', 'p1', 'p1', 'p1'],
-    ['r1', 'n1', 'b1', 'q1', 'k1', 'b1', 'n1', 'r1'],
-  ];
   // const START_POSITION = [
-  //   ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
-  //   ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
-  //   ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
-  //   ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
-  //   ['', '', '', '', 'r0', 'n0', 'b0', 'q0', 'k0', 'b0', 'n0', 'r0', '', '', '', ''],
-  //   ['', '', '', '', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0', '', '', '', ''],
-  //   ['', '', '', '', '',    '',   '',   '',   '',   '',   '',   '' , '', '', '', ''],
-  //   ['', '', '', '', '',    '',   '',   '',   '',   '',   '',   '' , '', '', '', ''],
-  //   ['', '', '', '', '',    '',   '',   '',   '',   '',   '',   '' , '', '', '', ''],
-  //   ['', '', '', '', '',    '',   '',   '',   '',   '',   '',   '' , '', '', '', ''],
-  //   ['', '', '', '', 'p1', 'p1', 'p1', 'p1', 'p1', 'p1', 'p1', 'p1', '', '', '', ''],
-  //   ['', '', '', '', 'r1', 'n1', 'b1', 'q1', 'k1', 'b1', 'n1', 'r1', '', '', '', ''],
-  //   ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
-  //   ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
-  //   ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
-  //   ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', '']
+  //   ['r0', 'n0', 'b0', 'q0', 'k0', 'b0', 'n0', 'r0'],
+  //   ['p0', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0'],
+  //   ['',    '',   '',   '',   '',   '',   '',   ''],
+  //   ['',    '',   '',   '',   '',   '',   '',   ''],
+  //   ['',    '',   '',   '',   '',   '',   '',   ''],
+  //   ['',    '',   '',   '',   '',   '',   '',   ''],
+  //   ['p1', 'p1', 'p1', 'p1', 'p1', 'p1', 'p1', 'p1'],
+  //   ['r1', 'n1', 'b1', 'q1', 'k1', 'b1', 'n1', 'r1'],
   // ];
-  const NUM_ROWS = START_POSITION.length;
-  const NUM_COLS = START_POSITION[0].length;
+  const START_POSITION = [
+    ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
+    ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
+    ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
+    ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
+    ['', '', '', '', 'r0', 'n0', 'b0', 'q0', 'k0', 'b0', 'n0', 'r0', '', '', '', ''],
+    ['', '', '', '', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0', '', '', '', ''],
+    ['', '', '', '', '',    '',   '',   '',   '',   '',   '',   '' , '', '', '', ''],
+    ['', '', '', '', '',    '',   '',   '',   '',   '',   '',   '' , '', '', '', ''],
+    ['', '', '', '', '',    '',   '',   '',   '',   '',   '',   '' , '', '', '', ''],
+    ['', '', '', '', '',    '',   '',   '',   '',   '',   '',   '' , '', '', '', ''],
+    ['', '', '', '', 'p1', 'p1', 'p1', 'p1', 'p1', 'p1', 'p1', 'p1', '', '', '', ''],
+    ['', '', '', '', 'r1', 'n1', 'b1', 'q1', 'k1', 'b1', 'n1', 'r1', '', '', '', ''],
+    ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
+    ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
+    ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
+    ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', '']
+  ];
 
-  console.assert(NUM_COLS <= 26);
-
-  const COLUMN_IDS = 'abcdefghijklmnopqrstuvwxyz'.split('').splice(0, NUM_COLS);
+  // console.assert(num_cols() <= 26);
+  // const COLUMN_IDS = 'abcdefghijklmnopqrstuvwxyz'.split(''); //.splice(0, num_cols());
   const DEFAULT_DRAG_THROTTLE_RATE = 20
   const ELLIPSIS = '…'
   const MINIMUM_JQUERY_VERSION = '1.8.3'
@@ -110,17 +107,6 @@
       }
     }
   }
-
-  // function debounce (f, interval, scope) {
-  //   var timeout = 0
-  //   return function (_args) {
-  //     window.clearTimeout(timeout)
-  //     var args = arguments
-  //     timeout = window.setTimeout(function () {
-  //       f.apply(scope, args)
-  //     }, interval)
-  //   }
-  // }
 
   function uuid () {
     return 'xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx'.replace(/x/g, function (c) {
@@ -216,49 +202,6 @@
     return isString(square) && square.search(/^[a-z][1-9][0-9]*$/) !== -1
   }
 
-  function validPieceCode (code) {
-    return isString(code) && code.search(/^[bw][KQRNBP]$/) !== -1
-  }
-
-  function validFen (fen) {
-    if (!isString(fen)) return false
-
-    // cut off any move, castling, etc info from the end
-    // we're only interested in position information
-    fen = fen.replace(/ .+$/, '')
-
-    // expand the empty square numbers to just 1s
-    fen = expandFenEmptySquares(fen)
-
-    // FEN should be 8 sections separated by slashes
-    var chunks = fen.split('/')
-    if (chunks.length !== 8) return false
-
-    // check each section
-    for (var i = 0; i < 8; i++) {
-      if (chunks[i].length !== 8 ||
-          chunks[i].search(/[^kqrnbpKQRNBP1]/) !== -1) {
-        return false
-      }
-    }
-
-    return true
-  }
-
-  function validPositionObject (pos) {
-    if (!$.isPlainObject(pos)) return false
-
-    for (var i in pos) {
-      if (!pos.hasOwnProperty(i)) continue
-
-      if (!validSquare(i) || !validPieceCode(pos[i])) {
-        return false
-      }
-    }
-
-    return true
-  }
-
   function isTouchDevice () {
     return 'ontouchstart' in document.documentElement
   }
@@ -274,123 +217,9 @@
   // Chess Util Functions
   // ---------------------------------------------------------------------------
 
-  // convert FEN piece code to bP, wK, etc
-  function fenToPieceCode (piece) {
-    // black piece
-    if (piece.toLowerCase() === piece) {
-      return 'b' + piece.toUpperCase()
-    }
-
-    // white piece
-    return 'w' + piece.toUpperCase()
-  }
-
-  // convert bP, wK, etc code to FEN structure
-  function pieceCodeToFen (piece) {
-    var pieceCodeLetters = piece.split('')
-
-    // white piece
-    if (pieceCodeLetters[0] === 'w') {
-      return pieceCodeLetters[1].toUpperCase()
-    }
-
-    // black piece
-    return pieceCodeLetters[1].toLowerCase()
-  }
-
-  // convert FEN string to position object
-  // returns false if the FEN string is invalid
-  function fenToObj (fen) {
-    if (!validFen(fen)) return false
-
-    // cut off any move, castling, etc info from the end
-    // we're only interested in position information
-    fen = fen.replace(/ .+$/, '')
-
-    var rows = fen.split('/')
-    var position = {}
-
-    var currentRow = 8
-    for (var i = 0; i < 8; i++) {
-      var row = rows[i].split('')
-      var colIdx = 0
-
-      // loop through each character in the FEN section
-      for (var j = 0; j < row.length; j++) {
-        // number / empty squares
-        if (row[j].search(/[1-8]/) !== -1) {
-          var numEmptySquares = parseInt(row[j], 10)
-          colIdx = colIdx + numEmptySquares
-        } else {
-          // piece
-          var square = COLUMN_IDS[colIdx] + currentRow
-          position[square] = fenToPieceCode(row[j])
-          colIdx = colIdx + 1
-        }
-      }
-
-      currentRow = currentRow - 1
-    }
-
-    return position
-  }
-
-  // position object to FEN string
-  // returns false if the obj is not a valid position object
-  function objToFen (obj) {
-    if (!validPositionObject(obj)) return false
-
-    var fen = ''
-
-    var currentRow = 8
-    for (var i = 0; i < 8; i++) {
-      for (var j = 0; j < 8; j++) {
-        var square = COLUMN_IDS[j] + currentRow
-
-        // piece exists
-        if (obj.hasOwnProperty(square)) {
-          fen = fen + pieceCodeToFen(obj[square])
-        } else {
-          // empty space
-          fen = fen + '1'
-        }
-      }
-
-      if (i !== 7) {
-        fen = fen + '/'
-      }
-
-      currentRow = currentRow - 1
-    }
-
-    // squeeze the empty numbers together
-    fen = squeezeFenEmptySquares(fen)
-
-    return fen
-  }
-
-  function squeezeFenEmptySquares (fen) {
-    return fen.replace(/11111111/g, '8')
-      .replace(/1111111/g, '7')
-      .replace(/111111/g, '6')
-      .replace(/11111/g, '5')
-      .replace(/1111/g, '4')
-      .replace(/111/g, '3')
-      .replace(/11/g, '2')
-  }
-
-  function expandFenEmptySquares (fen) {
-    return fen.replace(/8/g, '11111111')
-      .replace(/7/g, '1111111')
-      .replace(/6/g, '111111')
-      .replace(/5/g, '11111')
-      .replace(/4/g, '1111')
-      .replace(/3/g, '111')
-      .replace(/2/g, '11')
-  }
-
   // returns the distance between two squares
   function squareDistance (squareA, squareB) {
+    debugger;
     var squareAArray = squareA.split('')
     var squareAx = COLUMN_IDS.indexOf(squareAArray[0]) + 1
     var squareAy = parseInt(squareAArray[1], 10)
@@ -426,11 +255,12 @@
 
   // returns an array of closest squares from square
   function createRadius (square) {
+    debugger;
     var squares = []
 
     // calculate distance of all squares
-    for (var i = 0; i < NUM_COLS; i++) {
-      for (var j = 0; j < NUM_ROWS; j++) {
+    for (var i = 0; i < num_cols(); i++) {
+      for (var j = 0; j < num_rows(); j++) {
         var s = COLUMN_IDS[i] + (j + 1)
 
         // skip the square we're starting from
@@ -631,6 +461,18 @@
     var squareElsOffsets = {}
     var squareSize = 16
 
+    function num_rows() {
+      return currentPosition.length;
+    }
+
+    function num_cols() {
+      let res = currentPosition[0].length;
+      // TODO remove assert once we've completely ditched letters (mainly
+      // COLUMN_IDS)
+      console.assert(res <= 26);
+      return res
+    }
+
     // -------------------------------------------------------------------------
     // Validation / Errors
     // -------------------------------------------------------------------------
@@ -681,17 +523,15 @@
       if (config.hasOwnProperty('position')) {
         if (config.position === 'start') {
           currentPosition = deepCopy(START_POSITION)
-        } else if (validFen(config.position)) {
-          currentPosition = fenToObj(config.position)
-        } else if (validPositionObject(config.position)) {
-          currentPosition = deepCopy(config.position)
         } else {
+          currentPosition = deepCopy(config.position)
+        } /* else {
           error(
             7263,
             'Invalid value passed to config.position.',
             config.position
           )
-        }
+        } */
       }
     }
 
@@ -715,18 +555,18 @@
       // pad one pixel
       var boardWidth = containerWidth - 1
 
-      while (boardWidth % NUM_COLS !== 0 && boardWidth > 0) {
+      while (boardWidth % num_cols() !== 0 && boardWidth > 0) {
         boardWidth = boardWidth - 1
       }
 
-      return boardWidth / NUM_COLS
+      return boardWidth / num_cols()
     }
 
     // create random IDs for elements
     function createElIds () {
       // squares on the board
-      for (var i = 0; i < COLUMN_IDS.length; i++) {
-        for (var j = 0; j < NUM_ROWS; j++) {
+      for (var i = 0; i < num_cols(); i++) {
+        for (var j = 0; j < num_rows(); j++) {
           let square = i + '-' + j;
           squareElsIds[square] = square + '-' + uuid()
         }
@@ -741,9 +581,9 @@
       var html = ''
 
       var squareColor = 'white'
-      for (var i = 0; i < NUM_ROWS; i++) {
+      for (var i = 0; i < num_rows(); i++) {
         html += '<div class="{row}">'
-        for (var j = 0; j < NUM_COLS; j++) {
+        for (var j = 0; j < num_cols(); j++) {
           let square = i + '-' + j;
           html += '<div class="{square} ' + CSS[squareColor] + ' ' +
             'square-' + square + '" ' +
@@ -966,21 +806,13 @@
     function drawPositionInstant () {
       // clear the board
       $board.find('.' + CSS.piece).remove()
-
       // add the pieces
-      for (let i = 0; i < NUM_ROWS; i++) {
-        for (let j = 0; j < NUM_COLS; j++) {
+      for (let i = 0; i < num_rows(); i++) {
+        for (let j = 0; j < num_cols(); j++) {
           if (currentPosition[i][j] == '') continue;
-
           $('#' + squareElsIds[i + '-' + j]).append(buildPieceHTML(currentPosition[i][j]))
         }
       }
-      // // a1: "wR"
-      // for (var i in currentPosition) {
-      //   if (!currentPosition.hasOwnProperty(i)) continue
-
-      //   $('#' + squareElsIds[i]).append(buildPieceHTML(currentPosition[i]))
-      // }
     }
 
     function drawBoard () {
@@ -1263,11 +1095,6 @@
       $container.unbind()
     }
 
-    // shorthand method to get the current FEN
-    widget.fen = function () {
-      return widget.position('fen')
-    }
-
     // flip orientation
     widget.flip = function () {
       return widget.orientation('flip')
@@ -1340,32 +1167,22 @@
         return deepCopy(currentPosition)
       }
 
-      // // get position as FEN
-      // if (isString(position) && position.toLowerCase() === 'fen') {
-      //   return objToFen(currentPosition)
-      // }
-
       // start position
       if (isString(position) && position.toLowerCase() === 'start') {
         position = deepCopy(START_POSITION)
       }
 
-      // // convert FEN to position object
-      // if (validFen(position)) {
-      //   position = fenToObj(position)
-      // }
-
-      // // validate position object
-      // if (!validPositionObject(position)) {
-      //   error(6482, 'Invalid value passed to the position method.', position)
-      //   return
-      // }
-
       // default for useAnimations is true
       // if (useAnimation !== false) useAnimation = true
       useAnimation = false
 
-      if (useAnimation) {
+      if (num_rows() != position.length || num_cols() != position[0].length) {
+        // completely rebuild board
+        setCurrentPosition(position)
+        widget.resize();
+        // drawBoard()
+
+      } else if (useAnimation) {
         // start the animations
         var animations = calculateAnimations(currentPosition, position)
         doAnimations(animations, currentPosition, position)
@@ -1384,7 +1201,7 @@
       squareSize = calculateSquareSize()
 
       // set board width
-      $board.css('width', squareSize * NUM_COLS + 'px')
+      $board.css('width', squareSize * num_cols() + 'px')
 
       // set drag piece size
       $draggedPiece.css({
@@ -1607,57 +1424,7 @@
   // support legacy ChessBoard name
   window['ChessBoard'] = window['Chessboard']
 
-  // expose util functions
-  window['Chessboard']['fenToObj'] = fenToObj
-  window['Chessboard']['objToFen'] = objToFen
-
   if (RUN_ASSERTS) {
-    console.assert(validSquare('a1'))
-    console.assert(validSquare('e2'))
-    console.assert(!validSquare('D2'))
-    console.assert(!validSquare('g9'))
-    console.assert(!validSquare('a'))
-    console.assert(!validSquare(true))
-    console.assert(!validSquare(null))
-    console.assert(!validSquare({}))
-
-    console.assert(validPieceCode('bP'))
-    console.assert(validPieceCode('bK'))
-    console.assert(validPieceCode('wK'))
-    console.assert(validPieceCode('wR'))
-    console.assert(!validPieceCode('WR'))
-    console.assert(!validPieceCode('Wr'))
-    console.assert(!validPieceCode('a'))
-    console.assert(!validPieceCode(true))
-    console.assert(!validPieceCode(null))
-    console.assert(!validPieceCode({}))
-
-    console.assert(validFen(START_FEN))
-    console.assert(validFen('8/8/8/8/8/8/8/8'))
-    console.assert(validFen('r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R'))
-    console.assert(validFen('3r3r/1p4pp/2nb1k2/pP3p2/8/PB2PN2/p4PPP/R4RK1 b - - 0 1'))
-    console.assert(!validFen('3r3z/1p4pp/2nb1k2/pP3p2/8/PB2PN2/p4PPP/R4RK1 b - - 0 1'))
-    console.assert(!validFen('anbqkbnr/8/8/8/8/8/PPPPPPPP/8'))
-    console.assert(!validFen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/'))
-    console.assert(!validFen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBN'))
-    console.assert(!validFen('888888/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'))
-    console.assert(!validFen('888888/pppppppp/74/8/8/8/PPPPPPPP/RNBQKBNR'))
-    console.assert(!validFen({}))
-
-    console.assert(validPositionObject(START_POSITION))
-    console.assert(validPositionObject({}))
-    console.assert(validPositionObject({e2: 'wP'}))
-    console.assert(validPositionObject({e2: 'wP', d2: 'wP'}))
-    console.assert(!validPositionObject({e2: 'BP'}))
-    console.assert(!validPositionObject({y2: 'wP'}))
-    console.assert(!validPositionObject(null))
-    console.assert(!validPositionObject('start'))
-    console.assert(!validPositionObject(START_FEN))
-
-    console.assert(objToFen(START_POSITION) === START_FEN)
-    console.assert(objToFen({}) === '8/8/8/8/8/8/8/8')
-    console.assert(objToFen({a2: 'wP', 'b2': 'bP'}) === '8/8/8/8/8/8/Pp6/8')
-
     console.assert(interpolateTemplate('abc', {a: 'x'}) === 'abc')
     console.assert(interpolateTemplate('{a}bc', {}) === '{a}bc')
     console.assert(interpolateTemplate('{a}bc', {p: 'q'}) === '{a}bc')

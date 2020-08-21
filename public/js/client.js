@@ -46,8 +46,7 @@ function onDragStart2(source, piece, position, orientation) {
         return false
     }
 
-    // // only pick up pieces for White
-    // if (piece.search(/0$/) !== -1) return false
+    if (piece[1] !== '0') return false
 }
 
 function makeRandomMove() {
@@ -152,9 +151,12 @@ socket.on('DisplayBoard', (position, userId) => {
         document.getElementById('statusPGN').style.display = null
     }
 
-    config.position = 'start'
+    // config.position = 'start'
+    // board = ChessBoard('myBoard', config)
+    // board.position(position);
+
+    config.position = position
     board = ChessBoard('myBoard', config)
-    board.position(position);
 })
 
 //To turn off dragging
@@ -264,6 +266,10 @@ sendButtonEl.addEventListener('click', (e) => {
     var message = document.querySelector('#inputMessage').value
     var user = formEl[0].value
     var room = formEl[1].value
+
+    // prepend user name on message
+    message = user + ': ' + message;
+
     document.querySelector('#inputMessage').value = ''
     document.querySelector('#inputMessage').focus()
     socket.emit('sendMessage', { user, room, message })
