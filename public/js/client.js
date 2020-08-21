@@ -93,9 +93,9 @@ singlePlayerEl.addEventListener('click', (e) => {
     config = {
         draggable: true,
         position: 'start',
-        onDragStart: onDragStart2,
-        onDrop: onDrop2,
-        onSnapEnd: onSnapEnd2
+        // onDragStart: onDragStart2,
+        // onDrop: onDrop2,
+        // onSnapEnd: onSnapEnd2
     }
     board = Chessboard('myBoard', config);
 })

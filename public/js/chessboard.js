@@ -15,9 +15,36 @@
   // Constants
   // ---------------------------------------------------------------------------
 
-
-  const NUM_ROWS = 16;
-  const NUM_COLS = 16;
+  const START_POSITION = [
+    ['r0', 'n0', 'b0', 'q0', 'k0', 'b0', 'n0', 'r0'],
+    ['p0', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0'],
+    ['',    '',   '',   '',   '',   '',   '',   ''],
+    ['',    '',   '',   '',   '',   '',   '',   ''],
+    ['',    '',   '',   '',   '',   '',   '',   ''],
+    ['',    '',   '',   '',   '',   '',   '',   ''],
+    ['p1', 'p1', 'p1', 'p1', 'p1', 'p1', 'p1', 'p1'],
+    ['r1', 'n1', 'b1', 'q1', 'k1', 'b1', 'n1', 'r1'],
+  ];
+  // const START_POSITION = [
+  //   ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
+  //   ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
+  //   ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
+  //   ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
+  //   ['', '', '', '', 'r0', 'n0', 'b0', 'q0', 'k0', 'b0', 'n0', 'r0', '', '', '', ''],
+  //   ['', '', '', '', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0', 'p0', '', '', '', ''],
+  //   ['', '', '', '', '',    '',   '',   '',   '',   '',   '',   '' , '', '', '', ''],
+  //   ['', '', '', '', '',    '',   '',   '',   '',   '',   '',   '' , '', '', '', ''],
+  //   ['', '', '', '', '',    '',   '',   '',   '',   '',   '',   '' , '', '', '', ''],
+  //   ['', '', '', '', '',    '',   '',   '',   '',   '',   '',   '' , '', '', '', ''],
+  //   ['', '', '', '', 'p1', 'p1', 'p1', 'p1', 'p1', 'p1', 'p1', 'p1', '', '', '', ''],
+  //   ['', '', '', '', 'r1', 'n1', 'b1', 'q1', 'k1', 'b1', 'n1', 'r1', '', '', '', ''],
+  //   ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
+  //   ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
+  //   ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', ''],
+  //   ['', '', '', '',   '',   '',   '',   '',   '',   '',   '',   '', '', '', '', '']
+  // ];
+  const NUM_ROWS = START_POSITION.length;
+  const NUM_COLS = START_POSITION[0].length;
 
   console.assert(NUM_COLS <= 26);
 
@@ -26,8 +53,6 @@
   const ELLIPSIS = '…'
   const MINIMUM_JQUERY_VERSION = '1.8.3'
   const RUN_ASSERTS = false
-  const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
-  const START_POSITION = fenToObj(START_FEN)
 
   // default animation speeds
   const DEFAULT_APPEAR_SPEED = 200
@@ -51,9 +76,6 @@
   CSS['numeric'] = 'numeric-fc462'
   CSS['piece'] = 'piece-417db'
   CSS['row'] = 'row-5277c'
-  CSS['sparePieces'] = 'spare-pieces-7492f'
-  CSS['sparePiecesBottom'] = 'spare-pieces-bottom-ae20f'
-  CSS['sparePiecesTop'] = 'spare-pieces-top-4028b'
   CSS['square'] = 'square-55d63'
   CSS['white'] = 'white-1e1d7'
 
@@ -147,15 +169,6 @@
     return str
   }
 
-  if (RUN_ASSERTS) {
-    console.assert(interpolateTemplate('abc', {a: 'x'}) === 'abc')
-    console.assert(interpolateTemplate('{a}bc', {}) === '{a}bc')
-    console.assert(interpolateTemplate('{a}bc', {p: 'q'}) === '{a}bc')
-    console.assert(interpolateTemplate('{a}bc', {a: 'x'}) === 'xbc')
-    console.assert(interpolateTemplate('{a}bc{a}bc', {a: 'x'}) === 'xbcxbc')
-    console.assert(interpolateTemplate('{a}{a}{b}', {a: 'x', b: 'y'}) === 'xxy')
-  }
-
   // ---------------------------------------------------------------------------
   // Predicates
   // ---------------------------------------------------------------------------
@@ -191,6 +204,9 @@
 
     // move should be in the form of "e2-e4", "f6-d5"
     var squares = move.split('-')
+    // NOTE(logan) this will likely fail since you're separating data already
+    // with '-'. switch one of them to a different delimiter
+    console.assert(squares.length === 2);
     if (squares.length !== 2) return false
 
     return validSquare(squares[0]) && validSquare(squares[1])
@@ -200,32 +216,8 @@
     return isString(square) && square.search(/^[a-z][1-9][0-9]*$/) !== -1
   }
 
-  if (RUN_ASSERTS) {
-    console.assert(validSquare('a1'))
-    console.assert(validSquare('e2'))
-    console.assert(!validSquare('D2'))
-    console.assert(!validSquare('g9'))
-    console.assert(!validSquare('a'))
-    console.assert(!validSquare(true))
-    console.assert(!validSquare(null))
-    console.assert(!validSquare({}))
-  }
-
   function validPieceCode (code) {
     return isString(code) && code.search(/^[bw][KQRNBP]$/) !== -1
-  }
-
-  if (RUN_ASSERTS) {
-    console.assert(validPieceCode('bP'))
-    console.assert(validPieceCode('bK'))
-    console.assert(validPieceCode('wK'))
-    console.assert(validPieceCode('wR'))
-    console.assert(!validPieceCode('WR'))
-    console.assert(!validPieceCode('Wr'))
-    console.assert(!validPieceCode('a'))
-    console.assert(!validPieceCode(true))
-    console.assert(!validPieceCode(null))
-    console.assert(!validPieceCode({}))
   }
 
   function validFen (fen) {
@@ -253,20 +245,6 @@
     return true
   }
 
-  if (RUN_ASSERTS) {
-    console.assert(validFen(START_FEN))
-    console.assert(validFen('8/8/8/8/8/8/8/8'))
-    console.assert(validFen('r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R'))
-    console.assert(validFen('3r3r/1p4pp/2nb1k2/pP3p2/8/PB2PN2/p4PPP/R4RK1 b - - 0 1'))
-    console.assert(!validFen('3r3z/1p4pp/2nb1k2/pP3p2/8/PB2PN2/p4PPP/R4RK1 b - - 0 1'))
-    console.assert(!validFen('anbqkbnr/8/8/8/8/8/PPPPPPPP/8'))
-    console.assert(!validFen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/'))
-    console.assert(!validFen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBN'))
-    console.assert(!validFen('888888/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'))
-    console.assert(!validFen('888888/pppppppp/74/8/8/8/PPPPPPPP/RNBQKBNR'))
-    console.assert(!validFen({}))
-  }
-
   function validPositionObject (pos) {
     if (!$.isPlainObject(pos)) return false
 
@@ -279,18 +257,6 @@
     }
 
     return true
-  }
-
-  if (RUN_ASSERTS) {
-    console.assert(validPositionObject(START_POSITION))
-    console.assert(validPositionObject({}))
-    console.assert(validPositionObject({e2: 'wP'}))
-    console.assert(validPositionObject({e2: 'wP', d2: 'wP'}))
-    console.assert(!validPositionObject({e2: 'BP'}))
-    console.assert(!validPositionObject({y2: 'wP'}))
-    console.assert(!validPositionObject(null))
-    console.assert(!validPositionObject('start'))
-    console.assert(!validPositionObject(START_FEN))
   }
 
   function isTouchDevice () {
@@ -401,12 +367,6 @@
     fen = squeezeFenEmptySquares(fen)
 
     return fen
-  }
-
-  if (RUN_ASSERTS) {
-    console.assert(objToFen(START_POSITION) === START_FEN)
-    console.assert(objToFen({}) === '8/8/8/8/8/8/8/8')
-    console.assert(objToFen({a2: 'wP', 'b2': 'bP'}) === '8/8/8/8/8/8/Pp6/8')
   }
 
   function squeezeFenEmptySquares (fen) {
@@ -522,18 +482,10 @@
   // HTML
   // ---------------------------------------------------------------------------
 
-  function buildContainerHTML (hasSparePieces) {
+  function buildContainerHTML () {
     var html = '<div class="{chessboard}">'
 
-    if (hasSparePieces) {
-      html += '<div class="{sparePieces} {sparePiecesTop}"></div>'
-    }
-
     html += '<div class="{board}"></div>'
-
-    if (hasSparePieces) {
-      html += '<div class="{sparePieces} {sparePiecesBottom}"></div>'
-    }
 
     html += '</div>'
 
@@ -547,11 +499,12 @@
   function expandConfigArgumentShorthand (config) {
     if (config === 'start') {
       config = {position: deepCopy(START_POSITION)}
-    } else if (validFen(config)) {
-      config = {position: fenToObj(config)}
-    } else if (validPositionObject(config)) {
-      config = {position: deepCopy(config)}
     }
+    // else if (validFen(config)) {
+    //   config = {position: fenToObj(config)}
+    // } else if (validPositionObject(config)) {
+    //   config = {position: deepCopy(config)}
+    // }
 
     // config must be an object
     if (!$.isPlainObject(config)) config = {}
@@ -572,12 +525,6 @@
 
     // default for dropOffBoard is 'snapback'
     if (config.dropOffBoard !== 'trash') config.dropOffBoard = 'snapback'
-
-    // default for sparePieces is false
-    if (config.sparePieces !== true) config.sparePieces = false
-
-    // draggable must be true if sparePieces is enabled
-    if (config.sparePieces) config.draggable = true
 
     // default piece theme is wikipedia
     if (!config.hasOwnProperty('pieceTheme') ||
@@ -665,8 +612,6 @@
     // DOM elements
     var $board = null
     var $draggedPiece = null
-    var $sparePiecesTop = null
-    var $sparePiecesBottom = null
 
     // constructor return object
     var widget = {}
@@ -682,7 +627,6 @@
     var draggedPieceLocation = null
     var draggedPieceSource = null
     var isDragging = false
-    var sparePiecesElsIds = {}
     var squareElsIds = {}
     var squareElsOffsets = {}
     var squareSize = 16
@@ -782,19 +726,10 @@
     function createElIds () {
       // squares on the board
       for (var i = 0; i < COLUMN_IDS.length; i++) {
-        for (var j = 1; j <= NUM_ROWS; j++) {
-          var square = COLUMN_IDS[i] + j
+        for (var j = 0; j < NUM_ROWS; j++) {
+          let square = i + '-' + j;
           squareElsIds[square] = square + '-' + uuid()
         }
-      }
-
-      // spare pieces
-      var pieces = 'KQRNBP'.split('')
-      for (i = 0; i < pieces.length; i++) {
-        var whitePiece = 'w' + pieces[i]
-        var blackPiece = 'b' + pieces[i]
-        sparePiecesElsIds[whitePiece] = whitePiece + '-' + uuid()
-        sparePiecesElsIds[blackPiece] = blackPiece + '-' + uuid()
       }
     }
 
@@ -802,45 +737,19 @@
     // Markup Building
     // -------------------------------------------------------------------------
 
-    function buildBoardHTML (orientation) {
-      if (orientation !== 'black') {
-        orientation = 'white'
-      }
-
+    function buildBoardHTML () {
       var html = ''
-
-      // algebraic notation / orientation
-      var alpha = deepCopy(COLUMN_IDS)
-      var row = NUM_ROWS
-      if (orientation === 'black') {
-        alpha.reverse()
-        row = 1
-      }
 
       var squareColor = 'white'
       for (var i = 0; i < NUM_ROWS; i++) {
         html += '<div class="{row}">'
         for (var j = 0; j < NUM_COLS; j++) {
-          var square = alpha[j] + row
-
+          let square = i + '-' + j;
           html += '<div class="{square} ' + CSS[squareColor] + ' ' +
             'square-' + square + '" ' +
             'style="width:' + squareSize + 'px;height:' + squareSize + 'px;" ' +
             'id="' + squareElsIds[square] + '" ' +
             'data-square="' + square + '">'
-
-          if (config.showNotation) {
-            // alpha notation
-            if ((orientation === 'white' && row === 1) ||
-                (orientation === 'black' && row === NUM_ROWS)) {
-              html += '<div class="{notation} {alpha}">' + alpha[j] + '</div>'
-            }
-
-            // numeric notation
-            if (j === 0) {
-              html += '<div class="{notation} {numeric}">' + row + '</div>'
-            }
-          }
 
           html += '</div>' // end .square
 
@@ -849,18 +758,16 @@
         html += '<div class="{clearfix}"></div></div>'
 
         squareColor = (squareColor === 'white') ? 'black' : 'white'
-
-        if (orientation === 'white') {
-          row = row - 1
-        } else {
-          row = row + 1
-        }
       }
 
       return interpolateTemplate(html, CSS)
     }
 
     function buildPieceImgSrc (piece) {
+      if (piece.search(/^[a-z][0-9]$/) !== -1) {
+        piece = (piece[1] == 0 ? 'w' : 'b') + piece[0].toUpperCase();
+      }
+
       if (isFunction(config.pieceTheme)) {
         return config.pieceTheme(piece)
       }
@@ -891,20 +798,6 @@
       html += '" />'
 
       return interpolateTemplate(html, CSS)
-    }
-
-    function buildSparePiecesHTML (color) {
-      var pieces = ['wK', 'wQ', 'wR', 'wB', 'wN', 'wP']
-      if (color === 'black') {
-        pieces = ['bK', 'bQ', 'bR', 'bB', 'bN', 'bP']
-      }
-
-      var html = ''
-      for (var i = 0; i < pieces.length; i++) {
-        html += buildPieceHTML(pieces[i], false, sparePiecesElsIds[pieces[i]])
-      }
-
-      return html
     }
 
     // -------------------------------------------------------------------------
@@ -954,45 +847,6 @@
       $animatedPiece.animate(destSquarePosition, opts)
     }
 
-    function animateSparePieceToSquare (piece, dest, completeFn) {
-      var srcOffset = $('#' + sparePiecesElsIds[piece]).offset()
-      var $destSquare = $('#' + squareElsIds[dest])
-      var destOffset = $destSquare.offset()
-
-      // create the animate piece
-      var pieceId = uuid()
-      $('body').append(buildPieceHTML(piece, true, pieceId))
-      var $animatedPiece = $('#' + pieceId)
-      $animatedPiece.css({
-        display: '',
-        position: 'absolute',
-        left: srcOffset.left,
-        top: srcOffset.top
-      })
-
-      // on complete
-      function onFinishAnimation2 () {
-        // add the "real" piece to the destination square
-        $destSquare.find('.' + CSS.piece).remove()
-        $destSquare.append(buildPieceHTML(piece))
-
-        // remove the animated piece
-        $animatedPiece.remove()
-
-        // run complete function
-        if (isFunction(completeFn)) {
-          completeFn()
-        }
-      }
-
-      // animate the piece to the destination square
-      var opts = {
-        duration: config.moveSpeed,
-        complete: onFinishAnimation2
-      }
-      $animatedPiece.animate(destOffset, opts)
-    }
-
     // execute an array of animations
     function doAnimations (animations, oldPos, newPos) {
       if (animations.length === 0) return
@@ -1020,15 +874,11 @@
             .fadeOut(config.trashSpeed, onFinishAnimation3)
 
         // add a piece with no spare pieces - fade the piece onto the square
-        } else if (animation.type === 'add' && !config.sparePieces) {
+        } else if (animation.type === 'add') {
           $('#' + squareElsIds[animation.square])
             .append(buildPieceHTML(animation.piece, true))
             .find('.' + CSS.piece)
             .fadeIn(config.appearSpeed, onFinishAnimation3)
-
-        // add a piece with spare pieces - animate from the spares
-        } else if (animation.type === 'add' && config.sparePieces) {
-          animateSparePieceToSquare(animation.piece, animation.square, onFinishAnimation3)
 
         // move a piece from squareA to squareB
         } else if (animation.type === 'move') {
@@ -1118,39 +968,31 @@
       $board.find('.' + CSS.piece).remove()
 
       // add the pieces
-      for (var i in currentPosition) {
-        if (!currentPosition.hasOwnProperty(i)) continue
+      for (let i = 0; i < NUM_ROWS; i++) {
+        for (let j = 0; j < NUM_COLS; j++) {
+          if (currentPosition[i][j] == '') continue;
 
-        $('#' + squareElsIds[i]).append(buildPieceHTML(currentPosition[i]))
+          $('#' + squareElsIds[i + '-' + j]).append(buildPieceHTML(currentPosition[i][j]))
+        }
       }
+      // // a1: "wR"
+      // for (var i in currentPosition) {
+      //   if (!currentPosition.hasOwnProperty(i)) continue
+
+      //   $('#' + squareElsIds[i]).append(buildPieceHTML(currentPosition[i]))
+      // }
     }
 
     function drawBoard () {
       $board.html(buildBoardHTML(currentOrientation, squareSize, config.showNotation))
       drawPositionInstant()
-
-      if (config.sparePieces) {
-        if (currentOrientation === 'white') {
-          $sparePiecesTop.html(buildSparePiecesHTML('black'))
-          $sparePiecesBottom.html(buildSparePiecesHTML('white'))
-        } else {
-          $sparePiecesTop.html(buildSparePiecesHTML('white'))
-          $sparePiecesBottom.html(buildSparePiecesHTML('black'))
-        }
-      }
     }
 
     function setCurrentPosition (position) {
-      var oldPos = deepCopy(currentPosition)
-      var newPos = deepCopy(position)
-      var oldFen = objToFen(oldPos)
-      var newFen = objToFen(newPos)
-
-      // do nothing if no change in position
-      if (oldFen === newFen) return
-
       // run their onChange function
       if (isFunction(config.onChange)) {
+        var oldPos = deepCopy(currentPosition)
+        var newPos = deepCopy(position)
         config.onChange(oldPos, newPos)
       }
 
@@ -1192,12 +1034,6 @@
     }
 
     function snapbackDraggedPiece () {
-      // there is no "snapback" for spare pieces
-      if (draggedPieceSource === 'spare') {
-        trashDraggedPiece()
-        return
-      }
-
       removeSquareHighlights()
 
       // animation complete
@@ -1253,8 +1089,10 @@
 
       // update position
       var newPosition = deepCopy(currentPosition)
-      delete newPosition[draggedPieceSource]
-      newPosition[square] = draggedPiece
+      let [oldRow, oldCol] = parseIdx(draggedPieceSource);
+      let [newRow, newCol] = parseIdx(square);
+      newPosition[oldRow][oldCol] = '';
+      newPosition[newRow][newCol] = draggedPiece
       setCurrentPosition(newPosition)
 
       // get target square information
@@ -1295,12 +1133,7 @@
       draggedPiece = piece
       draggedPieceSource = source
 
-      // if the piece came from spare pieces, location is offboard
-      if (source === 'spare') {
-        draggedPieceLocation = 'offboard'
-      } else {
-        draggedPieceLocation = source
-      }
+      draggedPieceLocation = source
 
       // capture the x, y coords of all squares in memory
       captureSquareOffsets()
@@ -1313,13 +1146,11 @@
         top: y - squareSize / 2
       })
 
-      if (source !== 'spare') {
-        // highlight the source square and hide the piece
-        $('#' + squareElsIds[source])
-          .addClass(CSS.highlight1)
-          .find('.' + CSS.piece)
-          .css('display', 'none')
-      }
+      // highlight the source square and hide the piece
+      $('#' + squareElsIds[source])
+        .addClass(CSS.highlight1)
+        .find('.' + CSS.piece)
+        .css('display', 'none')
     }
 
     function updateDraggedPiece (x, y) {
@@ -1374,16 +1205,6 @@
       // run their onDrop function, which can potentially change the drop action
       if (isFunction(config.onDrop)) {
         var newPosition = deepCopy(currentPosition)
-
-        // source piece is a spare piece and position is off the board
-        // if (draggedPieceSource === 'spare' && location === 'offboard') {...}
-        // position has not changed; do nothing
-
-        // source piece is a spare piece and position is on the board
-        if (draggedPieceSource === 'spare' && validSquare(location)) {
-          // add the piece to the board
-          newPosition[location] = draggedPiece
-        }
 
         // source piece was on the board and position is off the board
         if (validSquare(draggedPieceSource) && location === 'offboard') {
@@ -1570,13 +1391,6 @@
         width: squareSize
       })
 
-      // spare pieces
-      if (config.sparePieces) {
-        $container
-          .find('.' + CSS.sparePieces)
-          .css('paddingLeft', squareSize + boardBorderSize + 'px')
-      }
-
       // redraw the board
       drawBoard()
     }
@@ -1594,16 +1408,22 @@
       evt.preventDefault()
     }
 
+    function parseIdx(square) {
+      let res = square.split('-');
+      console.assert(res.length === 2);
+      res.map(parseInt);
+      return res;
+    }
+
     function mousedownSquare (evt) {
       // do nothing if we're not draggable
       if (!config.draggable) return
 
       // do nothing if there is no piece on this square
-      var square = $(this).attr('data-square')
-      if (!validSquare(square)) return
-      if (!currentPosition.hasOwnProperty(square)) return
+      let [row, col] = parseIdx($(this).attr('data-square'));
+      if (currentPosition[row][col] === '') return
 
-      beginDraggingPiece(square, currentPosition[square], evt.pageX, evt.pageY)
+      beginDraggingPiece(row + '-' + col, currentPosition[row][col], evt.pageX, evt.pageY)
     }
 
     function touchstartSquare (e) {
@@ -1619,30 +1439,6 @@
       beginDraggingPiece(
         square,
         currentPosition[square],
-        e.changedTouches[0].pageX,
-        e.changedTouches[0].pageY
-      )
-    }
-
-    function mousedownSparePiece (evt) {
-      // do nothing if sparePieces is not enabled
-      if (!config.sparePieces) return
-
-      var piece = $(this).attr('data-piece')
-
-      beginDraggingPiece('spare', piece, evt.pageX, evt.pageY)
-    }
-
-    function touchstartSparePiece (e) {
-      // do nothing if sparePieces is not enabled
-      if (!config.sparePieces) return
-
-      var piece = $(this).attr('data-piece')
-
-      e = e.originalEvent
-      beginDraggingPiece(
-        'spare',
-        piece,
         e.changedTouches[0].pageX,
         e.changedTouches[0].pageY
       )
@@ -1748,7 +1544,6 @@
 
       // mouse drag pieces
       $board.on('mousedown', '.' + CSS.square, mousedownSquare)
-      $container.on('mousedown', '.' + CSS.sparePieces + ' .' + CSS.piece, mousedownSparePiece)
 
       // mouse enter / leave square
       $board
@@ -1764,7 +1559,6 @@
       // touch drag pieces
       if (isTouchDevice()) {
         $board.on('touchstart', '.' + CSS.square, touchstartSquare)
-        $container.on('touchstart', '.' + CSS.sparePieces + ' .' + CSS.piece, touchstartSparePiece)
         $window
           .on('touchmove', throttledTouchmoveWindow)
           .on('touchend', touchendWindow)
@@ -1776,13 +1570,8 @@
       createElIds()
 
       // build board and save it in memory
-      $container.html(buildContainerHTML(config.sparePieces))
+      $container.html(buildContainerHTML())
       $board = $container.find('.' + CSS.board)
-
-      if (config.sparePieces) {
-        $sparePiecesTop = $container.find('.' + CSS.sparePiecesTop)
-        $sparePiecesBottom = $container.find('.' + CSS.sparePiecesBottom)
-      }
 
       // create the drag piece
       var draggedPieceId = uuid()
@@ -1820,4 +1609,60 @@
   // expose util functions
   window['Chessboard']['fenToObj'] = fenToObj
   window['Chessboard']['objToFen'] = objToFen
+
+  if (RUN_ASSERTS) {
+    console.assert(validSquare('a1'))
+    console.assert(validSquare('e2'))
+    console.assert(!validSquare('D2'))
+    console.assert(!validSquare('g9'))
+    console.assert(!validSquare('a'))
+    console.assert(!validSquare(true))
+    console.assert(!validSquare(null))
+    console.assert(!validSquare({}))
+
+    console.assert(validPieceCode('bP'))
+    console.assert(validPieceCode('bK'))
+    console.assert(validPieceCode('wK'))
+    console.assert(validPieceCode('wR'))
+    console.assert(!validPieceCode('WR'))
+    console.assert(!validPieceCode('Wr'))
+    console.assert(!validPieceCode('a'))
+    console.assert(!validPieceCode(true))
+    console.assert(!validPieceCode(null))
+    console.assert(!validPieceCode({}))
+
+    console.assert(validFen(START_FEN))
+    console.assert(validFen('8/8/8/8/8/8/8/8'))
+    console.assert(validFen('r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R'))
+    console.assert(validFen('3r3r/1p4pp/2nb1k2/pP3p2/8/PB2PN2/p4PPP/R4RK1 b - - 0 1'))
+    console.assert(!validFen('3r3z/1p4pp/2nb1k2/pP3p2/8/PB2PN2/p4PPP/R4RK1 b - - 0 1'))
+    console.assert(!validFen('anbqkbnr/8/8/8/8/8/PPPPPPPP/8'))
+    console.assert(!validFen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/'))
+    console.assert(!validFen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBN'))
+    console.assert(!validFen('888888/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'))
+    console.assert(!validFen('888888/pppppppp/74/8/8/8/PPPPPPPP/RNBQKBNR'))
+    console.assert(!validFen({}))
+
+    console.assert(validPositionObject(START_POSITION))
+    console.assert(validPositionObject({}))
+    console.assert(validPositionObject({e2: 'wP'}))
+    console.assert(validPositionObject({e2: 'wP', d2: 'wP'}))
+    console.assert(!validPositionObject({e2: 'BP'}))
+    console.assert(!validPositionObject({y2: 'wP'}))
+    console.assert(!validPositionObject(null))
+    console.assert(!validPositionObject('start'))
+    console.assert(!validPositionObject(START_FEN))
+
+    console.assert(objToFen(START_POSITION) === START_FEN)
+    console.assert(objToFen({}) === '8/8/8/8/8/8/8/8')
+    console.assert(objToFen({a2: 'wP', 'b2': 'bP'}) === '8/8/8/8/8/8/Pp6/8')
+
+    console.assert(interpolateTemplate('abc', {a: 'x'}) === 'abc')
+    console.assert(interpolateTemplate('{a}bc', {}) === '{a}bc')
+    console.assert(interpolateTemplate('{a}bc', {p: 'q'}) === '{a}bc')
+    console.assert(interpolateTemplate('{a}bc', {a: 'x'}) === 'xbc')
+    console.assert(interpolateTemplate('{a}bc{a}bc', {a: 'x'}) === 'xbcxbc')
+    console.assert(interpolateTemplate('{a}{a}{b}', {a: 'x', b: 'y'}) === 'xxy')
+  }
+
 })() // end anonymous wrapper

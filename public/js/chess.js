@@ -1,0 +1,1 @@
+../../node_modules/chess.js/chess.js
