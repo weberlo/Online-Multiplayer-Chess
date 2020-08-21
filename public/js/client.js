@@ -38,7 +38,7 @@ function onDragStart2(source, piece, position, orientation) {
             alert('Game Draw!!');
         }
         else if (game.in_checkmate())
-            if (turnt === 1) {
+            if (turnt !== 0) {
                 alert('You won the game!!');
             } else {
                 alert('You lost!!');
@@ -60,7 +60,7 @@ function makeRandomMove() {
     var randomIdx = Math.floor(Math.random() * possibleMoves.length)
     game.move(possibleMoves[randomIdx]);
     myAudioEl.play();
-    turnt = 1 - turnt;
+    turnt = (turnt + 1) % Chess().NUM_PLAYERS;
     board.position(game.currentPosition());
 }
 
@@ -74,7 +74,11 @@ function squareAsArr(square) {
     return arr;
 }
 
-function onDrop2(source, target) {
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function onDrop2(source, target) {
     source = squareAsArr(source);
     target = squareAsArr(target);
 
@@ -87,9 +91,14 @@ function onDrop2(source, target) {
     myAudioEl.play();
     // illegal move
     if (move === null) return 'snapback'
-    turnt = 1 - turnt;
-    // make random legal move for black
-    window.setTimeout(makeRandomMove, 250)
+
+    turnt = (turnt + 1) % Chess().NUM_PLAYERS
+
+    while (turnt !== 0) {
+        // make random legal move for other players
+        await sleep(250);
+        makeRandomMove()
+    }
 }
 
 // update the board position after the piece snap
@@ -139,21 +148,18 @@ socket.on('printing', (fen) => {
 })
 
 //Catch Display event
-socket.on('DisplayBoard', (position, userId) => {
+socket.on('DisplayBoard', (position, userId, playerAssignments) => {
     //This is to be done initially only
     if (userId != undefined) {
         messageEl.textContent = 'Match Started!! Best of Luck...'
-        if (socket.id == userId) {
-            config.player = 1
-        } else {
-            config.player = 0
-        }
+        config.player = playerAssignments[socket.id];
         document.getElementById('joinFormDiv').style.display = "none";
         document.querySelector('#chessGame').style.display = null
         ChatEl.style.display = null
         document.getElementById('statusPGN').style.display = null
     }
 
+    console.log('ASSIGNED PLAYER ID ', config.player)
     console.assert('player' in config);
     config.position = position
     board = ChessBoard('myBoard', config)
@@ -310,7 +316,7 @@ multiPlayerEl.addEventListener('click', (e) => {
     //Clients just have to diaplay the game
     config = {
         draggable: false,   //Initially
-        position: 'start',
+        // position: 'start',
         onDrop: onDrop,
     }
     // var board = ChessBoard('myBoard', config)

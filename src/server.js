@@ -21,6 +21,9 @@ const roomsList = new Set()
 
 let totalUsers = 0;
 
+let roomPlayerCounters = {};
+let roomPlayerAssignments = {};
+
 //Getting a connection
 io.on('connection', (socket) => {
     totalUsers++;
@@ -50,9 +53,11 @@ io.on('connection', (socket) => {
 
     //Creating and joining the room
     socket.on('joinRoom', ({ user, room }, callback) => {
-        //We have to limit the number of users in a room to be just 2
-        if (io.nsps['/'].adapter.rooms[room] && io.nsps['/'].adapter.rooms[room].length === 2) {
-            return callback('Already 2 users are there in the room!')
+        const NUM_PLAYERS = 3;
+
+        //We have to limit the number of users in a room to be just NUM_PLAYERS
+        if (io.nsps['/'].adapter.rooms[room] && io.nsps['/'].adapter.rooms[room].length === NUM_PLAYERS) {
+            return callback(`Already ${NUM_PLAYERS} users are there in the room!`)
         }
 
         var alreadyPresent = false
@@ -73,13 +78,23 @@ io.on('connection', (socket) => {
         io.emit('roomsList', Array.from(roomsList));
         totalRooms = roomsList.length
         io.emit('totalRooms', totalRooms)
+
+        if (!(room in roomPlayerCounters)) {
+            roomPlayerCounters[room] = 0;
+            roomPlayerAssignments = {};
+        }
+        let player = roomPlayerCounters[room];
+        roomPlayerCounters[room]++;
+        roomPlayerAssignments[socket.id] = player;
+
         userData[user + "" + socket.id] = {
             room, user,
-            id: socket.id
+            id: socket.id,
+            player,
         }
 
-        //If two users are in the same room, we can start
-        if (io.nsps['/'].adapter.rooms[room].length === 2) {
+        //If NUM_PLAYERS users are in the same room, we can start
+        if (io.nsps['/'].adapter.rooms[room].length === NUM_PLAYERS) {
             //Rooms List Delete
             roomsList.delete(room);
             io.emit('roomsList', Array.from(roomsList));
@@ -92,7 +107,7 @@ io.on('connection', (socket) => {
             }
             //For giving turns one by one
             io.to(room).emit('Dragging', socket.id)
-            io.to(room).emit('DisplayBoard', game.currentPosition(), socket.id)
+            io.to(room).emit('DisplayBoard', game.currentPosition(), socket.id, roomPlayerAssignments)
             updateStatus(game, room)
         }
     })
@@ -138,6 +153,9 @@ io.on('connection', (socket) => {
             io.emit('roomsList', Array.from(roomsList));
             totalRooms = roomsList.length
             io.emit('totalRooms', totalRooms)
+            if (room in roomPlayerCounters) {
+                delete roomPlayerCounters[room]
+            }
         }
         gameData.delete(socket.id)
         if (user != '' && room != '') {
