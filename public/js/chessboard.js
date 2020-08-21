@@ -344,8 +344,8 @@
 
   // validate config / set default options
   function expandConfig (config) {
-    // default for orientation is white
-    if (config.orientation !== 'black') config.orientation = 'white'
+    // // default for orientation is white
+    // if (config.orientation !== 'black') config.orientation = 'white'
 
     // default for showNotation is true
     if (config.showNotation !== false) config.showNotation = true
@@ -438,6 +438,7 @@
     // ensure the config object is what we expect
     config = expandConfigArgumentShorthand(config)
     config = expandConfig(config)
+    console.assert('player' in config);
 
     // DOM elements
     var $board = null
@@ -451,7 +452,7 @@
     // -------------------------------------------------------------------------
 
     var boardBorderSize = 2
-    var currentOrientation = 'white'
+    var player = config.player;
     var currentPosition = {}
     var draggedPiece = null
     var draggedPieceLocation = null
@@ -517,8 +518,6 @@
     }
 
     function setInitialState () {
-      currentOrientation = config.orientation
-
       // make sure position is valid
       if (config.hasOwnProperty('position')) {
         if (config.position === 'start') {
@@ -816,7 +815,7 @@
     }
 
     function drawBoard () {
-      $board.html(buildBoardHTML(currentOrientation, squareSize, config.showNotation))
+      $board.html(buildBoardHTML())
       drawPositionInstant()
     }
 
@@ -878,8 +877,7 @@
           config.onSnapbackEnd(
             draggedPiece,
             draggedPieceSource,
-            deepCopy(currentPosition),
-            currentOrientation
+            deepCopy(currentPosition)
           )
         }
       }
@@ -956,7 +954,7 @@
       // run their custom onDragStart function
       // their custom onDragStart function can cancel drag start
       if (isFunction(config.onDragStart) &&
-          config.onDragStart(source, piece, deepCopy(currentPosition), currentOrientation) === false) {
+          config.onDragStart(source, piece, deepCopy(currentPosition)) === false) {
         return
       }
 
@@ -1015,8 +1013,7 @@
           draggedPieceLocation,
           draggedPieceSource,
           draggedPiece,
-          deepCopy(currentPosition),
-          currentOrientation
+          deepCopy(currentPosition)
         )
       }
 
@@ -1058,8 +1055,7 @@
           location,
           draggedPiece,
           newPosition,
-          oldPosition,
-          currentOrientation
+          oldPosition
         )
         if (result === 'snapback' || result === 'trash') {
           action = result
@@ -1095,10 +1091,10 @@
       $container.unbind()
     }
 
-    // flip orientation
-    widget.flip = function () {
-      return widget.orientation('flip')
-    }
+    // // flip orientation
+    // widget.flip = function () {
+    //   return widget.orientation('flip')
+    // }
 
     // move pieces
     // TODO: this method should be variadic as well as accept an array of moves
@@ -1136,29 +1132,6 @@
 
       // return the new position object
       return newPos
-    }
-
-    widget.orientation = function (arg) {
-      // no arguments, return the current orientation
-      if (arguments.length === 0) {
-        return currentOrientation
-      }
-
-      // set to white or black
-      if (arg === 'white' || arg === 'black') {
-        currentOrientation = arg
-        drawBoard()
-        return currentOrientation
-      }
-
-      // flip orientation
-      if (arg === 'flip') {
-        currentOrientation = currentOrientation === 'white' ? 'black' : 'white'
-        drawBoard()
-        return currentOrientation
-      }
-
-      error(5482, 'Invalid value passed to the orientation method.', arg)
     }
 
     widget.position = function (position, useAnimation) {
@@ -1211,6 +1184,10 @@
 
       // redraw the board
       drawBoard()
+    }
+
+    widget.player = function() {
+      return player;
     }
 
     // set the starting position
@@ -1325,7 +1302,7 @@
       }
 
       // execute their function
-      config.onMouseoverSquare(square, piece, deepCopy(currentPosition), currentOrientation)
+      config.onMouseoverSquare(square, piece, deepCopy(currentPosition))
     }
 
     function mouseleaveSquare (evt) {
@@ -1349,7 +1326,7 @@
       }
 
       // execute their function
-      config.onMouseoutSquare(square, piece, deepCopy(currentPosition), currentOrientation)
+      config.onMouseoutSquare(square, piece, deepCopy(currentPosition))
     }
 
     // -------------------------------------------------------------------------

@@ -143,7 +143,9 @@ socket.on('DisplayBoard', (position, userId) => {
     if (userId != undefined) {
         messageEl.textContent = 'Match Started!! Best of Luck...'
         if (socket.id == userId) {
-            config.orientation = 'black'
+            config.player = 1
+        } else {
+            config.player = 0
         }
         document.getElementById('joinFormDiv').style.display = "none";
         document.querySelector('#chessGame').style.display = null
@@ -151,10 +153,7 @@ socket.on('DisplayBoard', (position, userId) => {
         document.getElementById('statusPGN').style.display = null
     }
 
-    // config.position = 'start'
-    // board = ChessBoard('myBoard', config)
-    // board.position(position);
-
+    console.assert('player' in config);
     config.position = position
     board = ChessBoard('myBoard', config)
 })
@@ -170,21 +169,21 @@ socket.on('Dragging', id => {
 
 //To Update Status Element
 socket.on('updateStatus', (turn) => {
-    if (board.orientation().includes(turn)) {
+    if (turn == board.player()) {
         statusEl.textContent = "Your turn"
     }
     else {
-        statusEl.textContent = "Opponent's turn"
+        statusEl.textContent = "Player " + board.player() + "'s turn"
     }
 })
 
 //If in check
 socket.on('inCheck', turn => {
-    if (board.orientation().includes(turn)) {
+    if (turn == board.player()) {
         statusEl.textContent = "You are in Check!!"
     }
     else {
-        statusEl.textContent = "Opponent is in Check!!"
+        statusEl.textContent = "Player " + board.player() + " is in Check!!"
     }
 })
 
@@ -192,7 +191,7 @@ socket.on('inCheck', turn => {
 socket.on('gameOver', (turn, win) => {
     config.draggable = false;
     if (win) {
-        if (board.orientation().includes(turn)) {
+        if (turn == board.player()) {
             statusEl.textContent = "You lost, better luck next time :)"
         }
         else {
@@ -312,7 +311,6 @@ multiPlayerEl.addEventListener('click', (e) => {
         draggable: false,   //Initially
         position: 'start',
         onDrop: onDrop,
-        orientation: 'white'
     }
     // var board = ChessBoard('myBoard', config)
 })
