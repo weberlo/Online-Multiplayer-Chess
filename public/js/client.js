@@ -143,8 +143,8 @@ socket.on('updateEvent', ({ status, fen, pgn }) => {
     pgnEl.textContent = pgn
 })
 
-socket.on('printing', (fen) => {
-    console.log(fen)
+socket.on('print', (msg) => {
+    console.log(msg)
 })
 
 //Catch Display event
@@ -207,17 +207,18 @@ socket.on('inCheck', turn => {
 
 //If win or draw
 socket.on('gameOver', (turn, win) => {
+    debugger;
     config.draggable = false;
     if (win) {
         if (turn == board.player()) {
-            statusEl.textContent = "You lost, better luck next time :)"
+            statusEl.innerHTML = "You lost, better luck next time :)"
         }
         else {
-            statusEl.textContent = "Congratulations, you won!!"
+            statusEl.innerHTML = "Congratulations, you won!!"
         }
     }
     else {
-        statusEl.value = 'Game Draw'
+        statusEl.innerHTML = 'Game Draw'
     }
 })
 

@@ -7,7 +7,10 @@ var Chess = require('chess.js').Chess;
 
 const app = express()
 const server = http.createServer(app)
-const io = socketio(server)
+const io = socketio(server, {
+    pingTimeout: 10000000,
+    pingInterval: 1000000
+})
 
 const port = process.env.PORT || 3000
 const publicDirectoryPath = path.join(__dirname, '../public')
@@ -22,7 +25,7 @@ const roomsList = new Set()
 let totalUsers = 0;
 
 let roomPlayerCounters = {};
-let roomPlayerAssignments = {};
+let socketIdToPlayer = {};
 
 //Getting a connection
 io.on('connection', (socket) => {
@@ -32,21 +35,26 @@ io.on('connection', (socket) => {
     io.emit('roomsList', Array.from(roomsList));
     io.emit('updateTotalUsers', totalUsers)
     const updateStatus = (game, room) => {
+        console.log('about to update game status')
         // checkmate?
         if (game.in_checkmate()) {
             io.to(room).emit('gameOver', game.turn(), true)
+            console.log('gameOver checkmate with player turn == ', game.turn())
         }
         // draw?
         else if (game.in_draw()) {
             io.to(room).emit('gameOver', game.turn(), false)
+            console.log('gameOver draw with player turn == ', game.turn())
         }
         // game still on
         else {
             if (game.in_check()) {
                 io.to(room).emit('inCheck', game.turn())
+                console.log('inCheck with player turn == ', game.turn())
             }
             else {
                 io.to(room).emit('updateStatus', game.turn())
+                console.log('updateStatus with player turn == ', game.turn())
             }
         }
     }
@@ -82,11 +90,11 @@ io.on('connection', (socket) => {
 
         if (!(room in roomPlayerCounters)) {
             roomPlayerCounters[room] = 0;
-            roomPlayerAssignments = {};
+            socketIdToPlayer = {};
         }
         let player = roomPlayerCounters[room];
         roomPlayerCounters[room]++;
-        roomPlayerAssignments[socket.id] = player;
+        socketIdToPlayer[socket.id] = player;
 
         userData[user + "" + socket.id] = {
             room, user,
@@ -112,26 +120,38 @@ io.on('connection', (socket) => {
             }
             //For giving turns one by one
             io.to(room).emit('Dragging', socket.id)
-            io.to(room).emit('DisplayBoard', game.currentPosition(), socket.id, roomPlayerAssignments)
+            io.to(room).emit('DisplayBoard', game.currentPosition(), socket.id, socketIdToPlayer)
             updateStatus(game, room)
         }
     })
 
-    //For catching dropped event
+    // For catching dropped piece events
     socket.on('Dropped', ({ source, target, room }) => {
         var game = gameData[socket.id]
-        var move = game.move({
-            from: source,
-            to: target,
-            promotion: 'q' // NOTE: always promote to a queen for example simplicity
-        })
-        // If correct move, then toggle the turns
-        if (move != null) {
-            io.to(room).emit('Dragging', socket.id)
+        let eventPlayer = socketIdToPlayer[socket.id];
+        if (game.turn() == eventPlayer) {
+            var move = game.move({
+                from: source,
+                to: target,
+                promotion: 'q' // NOTE: always promote to a queen for example simplicity
+            })
+            if (move == null) {
+                io.to(room).emit('print', `player ${eventPlayer} made an INVALID move`)
+            } else {
+                // If correct move, then toggle the turns
+                io.to(room).emit('Dragging', socket.id)
+                io.to(room).emit('print', `player ${eventPlayer} made a move`)
+                io.to(room).emit('print', `it is now player ${game.turn()}'s turn`)
+            }
+        } else {
+            io.to(room).emit('print', `player ${eventPlayer} attempted to move during player ${game.turn()}'s turn`)
         }
+
+        // still update the board, even if no move was made on the server-side,
+        // since the client-side won't correct itself on incorrect moves
+        // TODO make the client-side correct itself
         io.to(room).emit('DisplayBoard', game.currentPosition(), undefined)
         updateStatus(game, room)
-        // io.to(room).emit('printing', game.fen())
     })
 
     //Catching message event
