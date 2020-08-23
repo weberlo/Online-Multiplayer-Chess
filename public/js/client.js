@@ -92,9 +92,7 @@ async function onDrop2(source, target) {
     // illegal move
     if (move === null) return 'snapback'
 
-    turnt = (turnt + 1) % Chess().NUM_PLAYERS
-
-    while (turnt !== 0) {
+    while (game.turn() !== 0) {
         // make random legal move for other players
         await sleep(250);
         makeRandomMove()
@@ -412,11 +410,11 @@ document.getElementById('messageBox').addEventListener('click', e => {
 // AUTOMATION
 //
 
-// // set player name
-// $(formEl[0]).val('ayy' + Math.random().toString().substring(2, 6));
-// // set room name
-// $(formEl[1]).val('commit');
-// multiPlayerEl.click()
-// joinButtonEl.click()
+// set player name
+$(formEl[0]).val('ayy' + Math.random().toString().substring(2, 6));
+// set room name
+$(formEl[1]).val('commit');
+multiPlayerEl.click()
+joinButtonEl.click()
 
-singlePlayerEl.click()
+// singlePlayerEl.click()
