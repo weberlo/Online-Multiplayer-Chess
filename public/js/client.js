@@ -412,10 +412,11 @@ document.getElementById('messageBox').addEventListener('click', e => {
 // AUTOMATION
 //
 
-// set player name
-$(formEl[0]).val('ayy' + Math.random().toString().substring(2, 6));
-// set room name
-$(formEl[1]).val('commit');
+// // set player name
+// $(formEl[0]).val('ayy' + Math.random().toString().substring(2, 6));
+// // set room name
+// $(formEl[1]).val('commit');
+// multiPlayerEl.click()
+// joinButtonEl.click()
 
-multiPlayerEl.click()
-joinButtonEl.click()
+singlePlayerEl.click()
