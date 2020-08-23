@@ -118,8 +118,7 @@ io.on('connection', (socket) => {
                 gameData[x] = game
             }
             //For giving turns one by one
-            io.to(room).emit('Dragging', socket.id)
-            io.to(room).emit('DisplayBoard', game.currentPosition(), socket.id, socketIdToPlayer)
+            io.to(room).emit('DisplayBoard', game.currentPosition(), socket.id, socketIdToPlayer, game.remaining_players(), game.turn())
             updateStatus(game, room)
         }
     })
@@ -137,8 +136,6 @@ io.on('connection', (socket) => {
             if (move == null) {
                 io.to(room).emit('print', `player ${eventPlayer} made an INVALID move`)
             } else {
-                // If correct move, then toggle the turns
-                io.to(room).emit('Dragging', socket.id)
                 io.to(room).emit('print', `player ${eventPlayer} made a move`)
                 io.to(room).emit('print', `it is now player ${game.turn()}'s turn`)
             }
@@ -149,7 +146,7 @@ io.on('connection', (socket) => {
         // still update the board, even if no move was made on the server-side,
         // since the client-side won't correct itself on incorrect moves
         // TODO make the client-side correct itself
-        io.to(room).emit('DisplayBoard', game.currentPosition(), undefined)
+        io.to(room).emit('DisplayBoard', game.currentPosition(), undefined, undefined, game.remaining_players(), game.turn())
         updateStatus(game, room)
     })
 

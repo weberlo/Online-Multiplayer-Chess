@@ -2,6 +2,7 @@ const formEl = document.querySelectorAll('#joinForm > div > input')
 const joinButtonEl = document.querySelector('#joinButton')
 const messageEl = document.querySelector('#message')
 const statusEl = document.querySelector('#status')
+const remainingPlayersEl = document.querySelector('#remaining_players')
 const ChatEl = document.querySelector('#chat')
 const sendButtonEl = document.querySelector('#send')
 const roomsListEl = document.getElementById('roomsList');
@@ -134,48 +135,43 @@ function onDrop(source, target) {
     socket.emit('Dropped', { source, target, room })
 }
 
-//Update Status Event
-socket.on('updateEvent', ({ status, fen, pgn }) => {
-    statusEl.textContent = status
-    fenEl.textContent = fen
-    pgnEl.textContent = pgn
-})
-
 socket.on('print', (msg) => {
     console.log(msg)
 })
 
+function genPlayerImgHtml(player, size='25px', style='') {
+  return `<img src='img/chesspieces/${player}/k.png' width='${size}' height='${size}' style='${style}' />`
+}
+
 //Catch Display event
-socket.on('DisplayBoard', (position, userId, playerAssignments) => {
+socket.on('DisplayBoard', (position, userId, socketIdToPlayer, remainingPlayers, turn) => {
     //This is to be done initially only
     if (userId != undefined) {
         messageEl.textContent = 'Match Started!! Best of Luck...'
-        config.player = playerAssignments[socket.id];
+        config.player = socketIdToPlayer[socket.id];
+        console.log('assigned player id ', config.player)
         document.getElementById('joinFormDiv').style.display = "none";
         document.querySelector('#chessGame').style.display = null
         ChatEl.style.display = null
         document.getElementById('statusPGN').style.display = null
     }
 
-    console.log('ASSIGNED PLAYER ID ', config.player)
     console.assert('player' in config);
     config.position = position
+    if (turn == config.player) {
+        config.draggable = true;
+    } else {
+        config.draggable = false;
+    }
     board = ChessBoard('myBoard', config)
-})
 
-//To turn off dragging
-socket.on('Dragging', id => {
-    config.draggable = true;
-    // if (socket.id != id) {
-    //     config.draggable = true;
-    // } else {
-    //     config.draggable = false;
-    // }
+    if (typeof remainingPlayers !== 'undefined') {
+        let remPlayersHtml = remainingPlayers.map(
+            player => genPlayerImgHtml(player, '30px'))
+            .join(', ');
+        remainingPlayersEl.innerHTML = remPlayersHtml
+    }
 })
-
-function genPlayerImgHtml(player) {
-  return "(<img src='img/chesspieces/" + player + "/k.png' width='25px' height='25px' />)"
-}
 
 //To Update Status Element
 socket.on('updateStatus', (turn) => {
@@ -186,7 +182,7 @@ socket.on('updateStatus', (turn) => {
     else {
         res = "Player " + turn + "'s turn";
     }
-    res += ' ' + genPlayerImgHtml(turn);
+    res += ' (' + genPlayerImgHtml(turn, '25px', 'margin-bottom: -5px;') + ')';
     statusEl.innerHTML = res;
 })
 
@@ -199,7 +195,7 @@ socket.on('inCheck', turn => {
     else {
         res = "Player " + board.player() + " is in Check!!"
     }
-    res += ' ' + genPlayerImgHtml(turn);
+    res += ' (' + genPlayerImgHtml(turn, '25px', 'margin-bottom: -5px;') + ')';
     statusEl.innerHTML = res;
 })
 
@@ -209,13 +205,11 @@ socket.on('gameOver', (turn, win) => {
     config.draggable = false;
     if (win) {
         if (turn == board.player()) {
+            statusEl.innerHTML = "Congratulations, you won!!"
+        } else {
             statusEl.innerHTML = "You lost, better luck next time :)"
         }
-        else {
-            statusEl.innerHTML = "Congratulations, you won!!"
-        }
-    }
-    else {
+    } else {
         statusEl.innerHTML = 'Game Draw'
     }
 })
