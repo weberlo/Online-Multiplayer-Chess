@@ -30,7 +30,6 @@ let socketIdToPlayer = {};
 //Getting a connection
 io.on('connection', (socket) => {
     totalUsers++;
-    // console.log(totalUsers)
     //To render rooms list initially
     io.emit('roomsList', Array.from(roomsList));
     io.emit('updateTotalUsers', totalUsers)
