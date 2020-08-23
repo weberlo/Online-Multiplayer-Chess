@@ -260,9 +260,9 @@
     var squares = []
 
     // calculate distance of all squares
-    for (var i = 0; i < num_cols(); i++) {
-      for (var j = 0; j < num_rows(); j++) {
-        var s = COLUMN_IDS[i] + (j + 1)
+    for (var i = 0; i < num_rows(); i++) {
+      for (var j = 0; j < num_cols(); j++) {
+        var s = COLUMN_IDS[j] + (i + 1)
 
         // skip the square we're starting from
         if (square === s) continue
@@ -565,8 +565,8 @@
     // create random IDs for elements
     function createElIds () {
       // squares on the board
-      for (var i = 0; i < num_cols(); i++) {
-        for (var j = 0; j < num_rows(); j++) {
+      for (var i = 0; i < num_rows(); i++) {
+        for (var j = 0; j < num_cols(); j++) {
           let square = i + '-' + j;
           squareElsIds[square] = square + '-' + uuid()
         }
