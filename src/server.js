@@ -53,7 +53,8 @@ io.on('connection', (socket) => {
 
     //Creating and joining the room
     socket.on('joinRoom', ({ user, room }, callback) => {
-        const NUM_PLAYERS = 3;
+        const NUM_PLAYERS = Chess().NUM_PLAYERS;
+        console.log("playing", NUM_PLAYERS, "player game")
 
         //We have to limit the number of users in a room to be just NUM_PLAYERS
         if (io.nsps['/'].adapter.rooms[room] && io.nsps['/'].adapter.rooms[room].length === NUM_PLAYERS) {
@@ -91,6 +92,10 @@ io.on('connection', (socket) => {
             room, user,
             id: socket.id,
             player,
+        }
+
+        if (io.nsps['/'].adapter.rooms[room]) {
+            console.log(io.nsps['/'].adapter.rooms[room].length, "players in lobby");
         }
 
         //If NUM_PLAYERS users are in the same room, we can start

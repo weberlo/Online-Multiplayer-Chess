@@ -2,3 +2,4 @@
 # athena is running into cert issues
 #
 # node_modules
+.DS_Store

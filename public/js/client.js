@@ -167,31 +167,42 @@ socket.on('DisplayBoard', (position, userId, playerAssignments) => {
 
 //To turn off dragging
 socket.on('Dragging', id => {
-    if (socket.id != id) {
-        config.draggable = true;
-    } else {
-        config.draggable = false;
-    }
+    config.draggable = true;
+    // if (socket.id != id) {
+    //     config.draggable = true;
+    // } else {
+    //     config.draggable = false;
+    // }
 })
+
+function genPlayerImgHtml(player) {
+  return "(<img src='img/chesspieces/" + player + "/k.png' width='25px' height='25px' />)"
+}
 
 //To Update Status Element
 socket.on('updateStatus', (turn) => {
+    let res;
     if (turn == board.player()) {
-        statusEl.innerHTML = "Your turn"
+        res = "Your turn";
     }
     else {
-        statusEl.innerHTML = "Player " + turn + "'s turn (<img src='img/chesspieces/" + turn + "/k.png' width='25px' height='25px' />)"
+        res = "Player " + turn + "'s turn";
     }
+    res += ' ' + genPlayerImgHtml(turn);
+    statusEl.innerHTML = res;
 })
 
 //If in check
 socket.on('inCheck', turn => {
+    let res;
     if (turn == board.player()) {
-        statusEl.textContent = "You are in Check!!"
+        res = "You are in Check!!"
     }
     else {
-        statusEl.textContent = "Player " + board.player() + " is in Check!!"
+        res = "Player " + board.player() + " is in Check!!"
     }
+    res += ' ' + genPlayerImgHtml(turn);
+    statusEl.innerHTML = res;
 })
 
 //If win or draw
@@ -395,3 +406,15 @@ document.getElementById('messageBox').addEventListener('click', e => {
         document.getElementById('chatBox').style.display = 'none';
     }
 })
+
+//
+// AUTOMATION
+//
+
+// set player name
+$(formEl[0]).val('ayy' + Math.random().toString().substring(2, 6));
+// set room name
+$(formEl[1]).val('commit');
+
+multiPlayerEl.click()
+joinButtonEl.click()
