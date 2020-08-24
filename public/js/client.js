@@ -15,7 +15,6 @@ const chatContentEl = document.getElementById('chatContent')
 var config = {};
 var board = null;
 var game = new Chess()
-var turnt = 0;
 
 // initializing semantic UI dropdown
 $('.ui.dropdown')
@@ -33,19 +32,40 @@ $("#roomDropdown").dropdown({
 
 
 function onDragStart2(source, piece, position, orientation) {
-    // do not pick up pieces if the game is over
-    if (game.game_over()) {
-        if (game.in_draw()) {
-            alert('Game Draw!!');
-        }
-        else if (game.in_checkmate())
-            if (turnt !== 0) {
-                alert('You won the game!!');
-            } else {
-                alert('You lost!!');
-            }
+    // // do not pick up pieces if the game is over
+    // if (game.game_over()) {
+    //     let players = game.remaining_players()
+    //     if (players.length === 1 && players[0] === 0) {
+    //         alert('you won!')
+    //     } else if (!(0 in players)) {
+    //         if (game.in_checkmate()) {
+    //             alert('you lost by checkmate')
+    //         } else if (game.in_stalemate()) {
+    //             alert('you lost by stalemate')
+    //         }
+    //     }
+    //     return false
+    // }
+
+    let players = game.remaining_players()
+    if (players.length === 1 && players[0] === 0) {
+        alert('you won!')
+        return false
+    } else if (players.indexOf(0) === -1) {
+        alert('you lost!')
         return false
     }
+    //     if (game.in_draw()) {
+    //         alert('Game Draw!!');
+    //     }
+    //     else if (game.in_checkmate())
+    //         if (turnt !== 0) {
+    //             alert('You won the game!!');
+    //         } else {
+    //             alert('You lost!!');
+    //         }
+    //     return false
+    // }
 
     if (piece[1] !== '0') return false
 }
@@ -55,18 +75,19 @@ function makeRandomMove() {
 
     // game over
     if (possibleMoves.length === 0) {
-        return;
+        return false;
     }
 
     var randomIdx = Math.floor(Math.random() * possibleMoves.length)
     game.move(possibleMoves[randomIdx]);
     myAudioEl.play();
-    turnt = (turnt + 1) % Chess().NUM_PLAYERS;
+    // turnt = (turnt + 1) % Chess().NUM_PLAYERS;
     board.position(game.currentPosition());
+    return true;
 }
 
 function squareAsArr(square) {
-    // NOTE for whatever reasoning, the map is generating a NaN, so we unfold
+    // NOTE for whatever reason, the map is generating a NaN, so we unfold
     // it manually below
     // move.from = move.from.split('-').map(parseInt);
     let arr = square.split('-');
@@ -93,11 +114,12 @@ async function onDrop2(source, target) {
     // illegal move
     if (move === null) return 'snapback'
 
-    while (game.turn() !== 0) {
+    while (0 in game.remaining_players() && game.turn() !== 0) {
         // make random legal move for other players
         await sleep(250);
-        makeRandomMove()
+        makeRandomMove();
     }
+    updateRemainingPlayers(game.remaining_players())
 }
 
 // update the board position after the piece snap
@@ -110,6 +132,7 @@ singlePlayerEl.addEventListener('click', (e) => {
     e.preventDefault();
     document.getElementById('gameMode').style.display = "none";
     document.querySelector('#chessGame').style.display = null;
+    document.getElementById('statusPGN').style.display = null
     config = {
         draggable: true,
         position: 'start',
@@ -119,6 +142,8 @@ singlePlayerEl.addEventListener('click', (e) => {
         onSnapEnd: onSnapEnd2
     }
     board = Chessboard('myBoard', config);
+
+    updateRemainingPlayers(game.remaining_players())
 })
 
 //Connection will be established after webpage is refreshed
@@ -143,6 +168,13 @@ function genPlayerImgHtml(player, size='25px', style='') {
   return `<img src='img/chesspieces/${player}/k.png' width='${size}' height='${size}' style='${style}' />`
 }
 
+function updateRemainingPlayers(remainingPlayers) {
+    let remPlayersHtml = remainingPlayers.map(
+        player => genPlayerImgHtml(player, '30px'))
+        .join(', ');
+    remainingPlayersEl.innerHTML = remPlayersHtml
+}
+
 //Catch Display event
 socket.on('DisplayBoard', (position, userId, socketIdToPlayer, remainingPlayers, turn) => {
     //This is to be done initially only
@@ -164,12 +196,8 @@ socket.on('DisplayBoard', (position, userId, socketIdToPlayer, remainingPlayers,
         config.draggable = false;
     }
     board = ChessBoard('myBoard', config)
-
     if (typeof remainingPlayers !== 'undefined') {
-        let remPlayersHtml = remainingPlayers.map(
-            player => genPlayerImgHtml(player, '30px'))
-            .join(', ');
-        remainingPlayersEl.innerHTML = remPlayersHtml
+        updateRemainingPlayers()
     }
 })
 
@@ -404,11 +432,11 @@ document.getElementById('messageBox').addEventListener('click', e => {
 // AUTOMATION
 //
 
-// set player name
-$(formEl[0]).val('ayy' + Math.random().toString().substring(2, 6));
-// set room name
-$(formEl[1]).val('commit');
-multiPlayerEl.click()
-joinButtonEl.click()
+// // set player name
+// $(formEl[0]).val('ayy' + Math.random().toString().substring(2, 6));
+// // set room name
+// $(formEl[1]).val('commit');
+// multiPlayerEl.click()
+// joinButtonEl.click()
 
-// singlePlayerEl.click()
+singlePlayerEl.click()
