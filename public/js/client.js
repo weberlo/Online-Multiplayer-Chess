@@ -30,23 +30,11 @@ $("#roomDropdown").dropdown({
     }
 });
 
+function onDragStart(source, piece, position, orientation) {
+    if (piece[1] != config.player) return false
+}
 
 function onDragStart2(source, piece, position, orientation) {
-    // // do not pick up pieces if the game is over
-    // if (game.game_over()) {
-    //     let players = game.remaining_players()
-    //     if (players.length === 1 && players[0] === 0) {
-    //         alert('you won!')
-    //     } else if (!(0 in players)) {
-    //         if (game.in_checkmate()) {
-    //             alert('you lost by checkmate')
-    //         } else if (game.in_stalemate()) {
-    //             alert('you lost by stalemate')
-    //         }
-    //     }
-    //     return false
-    // }
-
     let players = game.remaining_players()
     if (players.length === 1 && players[0] === 0) {
         alert('you won!')
@@ -55,17 +43,6 @@ function onDragStart2(source, piece, position, orientation) {
         alert('you lost!')
         return false
     }
-    //     if (game.in_draw()) {
-    //         alert('Game Draw!!');
-    //     }
-    //     else if (game.in_checkmate())
-    //         if (turnt !== 0) {
-    //             alert('You won the game!!');
-    //         } else {
-    //             alert('You lost!!');
-    //         }
-    //     return false
-    // }
 
     if (piece[1] !== '0') return false
 }
@@ -177,6 +154,9 @@ function updateRemainingPlayers(remainingPlayers) {
 
 //Catch Display event
 socket.on('DisplayBoard', (position, userId, socketIdToPlayer, remainingPlayers, turn) => {
+    // save scroll position then restore it after rebuilding the board
+    let tempScrollTop = $(window).scrollTop();
+
     //This is to be done initially only
     if (userId != undefined) {
         messageEl.textContent = 'Match Started!! Best of Luck...'
@@ -196,9 +176,12 @@ socket.on('DisplayBoard', (position, userId, socketIdToPlayer, remainingPlayers,
         config.draggable = false;
     }
     board = ChessBoard('myBoard', config)
+
     if (typeof remainingPlayers !== 'undefined') {
-        updateRemainingPlayers()
+        updateRemainingPlayers(remainingPlayers)
     }
+
+    $(window).scrollTop(tempScrollTop);
 })
 
 //To Update Status Element
@@ -349,6 +332,7 @@ multiPlayerEl.addEventListener('click', (e) => {
     config = {
         draggable: false,   //Initially
         // position: 'start',
+        onDragStart: onDragStart,
         onDrop: onDrop,
     }
     // var board = ChessBoard('myBoard', config)
@@ -432,11 +416,11 @@ document.getElementById('messageBox').addEventListener('click', e => {
 // AUTOMATION
 //
 
-// // set player name
-// $(formEl[0]).val('ayy' + Math.random().toString().substring(2, 6));
-// // set room name
-// $(formEl[1]).val('commit');
-// multiPlayerEl.click()
-// joinButtonEl.click()
+// set player name
+$(formEl[0]).val('ayy' + Math.random().toString().substring(2, 6));
+// set room name
+$(formEl[1]).val('commit');
+multiPlayerEl.click()
+joinButtonEl.click()
 
-singlePlayerEl.click()
+// singlePlayerEl.click()
