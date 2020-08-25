@@ -471,7 +471,7 @@
       let res = currentPosition[0].length;
       // TODO remove assert once we've completely ditched letters (mainly
       // COLUMN_IDS)
-      console.assert(res <= 26);
+      // console.assert(res <= 26);
       return res
     }
 
@@ -604,8 +604,12 @@
     }
 
     function buildPieceImgSrc (piece) {
-      let [type, player] = piece.split('')
-      return 'img/chesspieces/' + player + '/' + type +'.png'
+      if (piece == 'x') {
+        return 'img/wall.png'
+      } else {
+        let [type, player] = piece.split('')
+        return 'img/chesspieces/' + player + '/' + type +'.png'
+      }
     }
 
     function buildPieceHTML (piece, hidden, id) {
@@ -796,7 +800,7 @@
       // add the pieces
       for (let i = 0; i < num_rows(); i++) {
         for (let j = 0; j < num_cols(); j++) {
-          if (currentPosition[i][j] == '') continue;
+          if (currentPosition[i][j].length === 0) continue;
           $('#' + squareElsIds[i + '-' + j]).append(buildPieceHTML(currentPosition[i][j]))
         }
       }
