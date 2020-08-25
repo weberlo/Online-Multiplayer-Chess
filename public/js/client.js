@@ -96,7 +96,7 @@ async function onDrop2(source, target) {
 
     while (0 in game.remaining_players() && game.turn() !== 0 && !game.game_over()) {
         // make random legal move for other players
-        await sleep(250);
+        await sleep(150);
         makeRandomMove();
     }
     updateRemainingPlayers(game.remaining_players())
