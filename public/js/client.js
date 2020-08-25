@@ -42,6 +42,9 @@ function onDragStart2(source, piece, position, orientation) {
     } else if (players.indexOf(0) === -1) {
         alert('you lost!')
         return false
+    } else if (game.in_stalemate()) {
+        alert('you lost by stalemate!')
+        return false
     }
 
     if (piece[1] !== '0') return false
@@ -91,7 +94,7 @@ async function onDrop2(source, target) {
     // illegal move
     if (move === null) return 'snapback'
 
-    while (0 in game.remaining_players() && game.turn() !== 0) {
+    while (0 in game.remaining_players() && game.turn() !== 0 && !game.game_over()) {
         // make random legal move for other players
         await sleep(250);
         makeRandomMove();
@@ -416,11 +419,11 @@ document.getElementById('messageBox').addEventListener('click', e => {
 // AUTOMATION
 //
 
-// set player name
-$(formEl[0]).val('ayy' + Math.random().toString().substring(2, 6));
-// set room name
-$(formEl[1]).val('commit');
-multiPlayerEl.click()
-joinButtonEl.click()
+// // set player name
+// $(formEl[0]).val('ayy' + Math.random().toString().substring(2, 6));
+// // set room name
+// $(formEl[1]).val('commit');
+// multiPlayerEl.click()
+// joinButtonEl.click()
 
-// singlePlayerEl.click()
+singlePlayerEl.click()
