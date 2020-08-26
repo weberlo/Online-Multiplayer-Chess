@@ -597,7 +597,9 @@
         }
         html += '<div class="{clearfix}"></div></div>'
 
-        squareColor = (squareColor === 'white') ? 'black' : 'white'
+        if (num_rows() % 2 === 0) {
+          squareColor = (squareColor === 'white') ? 'black' : 'white'
+        }
       }
 
       return interpolateTemplate(html, CSS)
@@ -1176,6 +1178,10 @@
 
       // redraw the board
       drawBoard()
+    }
+
+    widget.set_draggable = function(draggable) {
+      config.draggable = draggable
     }
 
     widget.player = function() {

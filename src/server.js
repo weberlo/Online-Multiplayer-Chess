@@ -33,30 +33,30 @@ io.on('connection', (socket) => {
     //To render rooms list initially
     io.emit('roomsList', Array.from(roomsList));
     io.emit('updateTotalUsers', totalUsers)
-    const updateStatus = (game, room) => {
-        console.log('about to update game status')
-        // checkmate?
-        if (game.in_checkmate()) {
-            io.to(room).emit('gameOver', game.turn(), true)
-            console.log('gameOver checkmate with player turn == ', game.turn())
-        }
-        // draw?
-        else if (game.in_draw()) {
-            io.to(room).emit('gameOver', game.turn(), false)
-            console.log('gameOver draw with player turn == ', game.turn())
-        }
-        // game still on
-        else {
-            if (game.in_check()) {
-                io.to(room).emit('inCheck', game.turn())
-                console.log('inCheck with player turn == ', game.turn())
-            }
-            else {
-                io.to(room).emit('updateStatus', game.turn())
-                console.log('updateStatus with player turn == ', game.turn())
-            }
-        }
-    }
+    // const updateStatus = (game, room) => {
+    //     console.log('about to update game status')
+    //     // checkmate?
+    //     if (game.in_checkmate()) {
+    //         io.to(room).emit('gameOver', game.turn(), true)
+    //         console.log('gameOver checkmate with player turn == ', game.turn())
+    //     }
+    //     // draw?
+    //     else if (game.in_draw()) {
+    //         io.to(room).emit('gameOver', game.turn(), false)
+    //         console.log('gameOver draw with player turn == ', game.turn())
+    //     }
+    //     // game still on
+    //     else {
+    //         if (game.in_check()) {
+    //             io.to(room).emit('inCheck', game.turn())
+    //             console.log('inCheck with player turn == ', game.turn())
+    //         }
+    //         else {
+    //             io.to(room).emit('updateStatus', game.turn())
+    //             console.log('updateStatus with player turn == ', game.turn())
+    //         }
+    //     }
+    // }
 
     //Creating and joining the room
     socket.on('joinRoom', ({ user, room }, callback) => {
@@ -118,36 +118,33 @@ io.on('connection', (socket) => {
                 gameData[x] = game
             }
             //For giving turns one by one
-            io.to(room).emit('DisplayBoard', game.currentPosition(), socket.id, socketIdToPlayer, game.remaining_players(), game.turn())
-            updateStatus(game, room)
+            io.to(room).emit('SetupBoard', socketIdToPlayer)
+            // updateStatus(game, room)
         }
     })
 
     // For catching dropped piece events
-    socket.on('Dropped', ({ source, target, room }) => {
-        var game = gameData[socket.id]
+    socket.on('MakeMove', ({ move, room }) => {
+        let game = gameData[socket.id]
         let eventPlayer = socketIdToPlayer[socket.id];
-        if (game.turn() == eventPlayer) {
-            var move = game.move({
-                from: source,
-                to: target,
-                promotion: 'q' // NOTE: always promote to a queen for example simplicity
-            })
-            if (move == null) {
-                io.to(room).emit('print', `player ${eventPlayer} made an INVALID move`)
-            } else {
-                io.to(room).emit('print', `player ${eventPlayer} made a move`)
-                io.to(room).emit('print', `it is now player ${game.turn()}'s turn`)
-            }
-        } else {
-            io.to(room).emit('print', `player ${eventPlayer} attempted to move during player ${game.turn()}'s turn`)
-        }
+        console.assert(game.turn() == eventPlayer)
+        let move_res = game.move(move)
+        console.assert(move_res != null)
+        // if (move == null) {
+        //     io.to(room).emit('print', `player ${eventPlayer} made an INVALID move`)
+        // } else {
+        //     io.to(room).emit('print', `player ${eventPlayer} made a move`)
+        //     io.to(room).emit('print', `it is now player ${game.turn()}'s turn`)
+        // }
+        // } else {
+        //     io.to(room).emit('print', `player ${eventPlayer} attempted to move during player ${game.turn()}'s turn`)
+        // }
 
         // still update the board, even if no move was made on the server-side,
         // since the client-side won't correct itself on incorrect moves
         // TODO make the client-side correct itself
-        io.to(room).emit('DisplayBoard', game.currentPosition(), undefined, undefined, game.remaining_players(), game.turn())
-        updateStatus(game, room)
+        io.to(room).emit('MakeMove', eventPlayer, move)
+        // updateStatus(game, room)
     })
 
     //Catching message event

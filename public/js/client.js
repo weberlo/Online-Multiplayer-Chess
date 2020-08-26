@@ -31,27 +31,11 @@ $("#roomDropdown").dropdown({
 });
 
 function onDragStart(source, piece, position, orientation) {
-    if (piece[1] != config.player) return false
-}
-
-function onDragStart2(source, piece, position, orientation) {
-    let players = game.remaining_players()
-    if (players.length === 1 && players[0] === 0) {
-        alert('you won!')
-        return false
-    } else if (players.indexOf(0) === -1) {
-        alert('you lost!')
-        return false
-    } else if (game.in_stalemate()) {
-        alert('you lost by stalemate!')
-        return false
-    }
-
-    if (piece[1] !== '0') return false
+    if (piece[1] != board.player()) return false
 }
 
 function makeRandomMove() {
-    var possibleMoves = game.moves()
+    let possibleMoves = game.moves()
 
     // game over
     if (possibleMoves.length === 0) {
@@ -59,11 +43,7 @@ function makeRandomMove() {
     }
 
     var randomIdx = Math.floor(Math.random() * possibleMoves.length)
-    game.move(possibleMoves[randomIdx]);
-    myAudioEl.play();
-    // turnt = (turnt + 1) % Chess().NUM_PLAYERS;
-    board.position(game.currentPosition());
-    return true;
+    makeMove(possibleMoves[randomIdx])
 }
 
 function squareAsArr(square) {
@@ -80,32 +60,40 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function onDrop2(source, target) {
+function makeMove(move) {
+    // see if the move is legal
+    let move_res = game.move(move)
+    board.position(game.currentPosition());
+    myAudioEl.play();
+    update();
+    return move_res
+}
+
+function onDropCommon(source, target) {
     source = squareAsArr(source);
     target = squareAsArr(target);
 
-    // see if the move is legal
-    var move = game.move({
+    return makeMove({
         from: source,
         to: target,
         promotion: 'q' // NOTE: always promote to a queen for example simplicity
     })
-    myAudioEl.play();
-    // illegal move
-    if (move === null) return 'snapback'
+}
 
+async function makeCpuMovesSp() {
     while (0 in game.remaining_players() && game.turn() !== 0 && !game.game_over()) {
         // make random legal move for other players
         await sleep(150);
         makeRandomMove();
     }
-    updateRemainingPlayers(game.remaining_players())
 }
 
-// update the board position after the piece snap
-// for castling, en passant, pawn promotion
-function onSnapEnd2() {
-    board.position(game.currentPosition())
+function onDropSp(source, target) {
+    if (onDropCommon(source, target) === null) {
+        // illegal move
+        return 'snapback'
+    }
+    makeCpuMovesSp()
 }
 
 singlePlayerEl.addEventListener('click', (e) => {
@@ -117,27 +105,27 @@ singlePlayerEl.addEventListener('click', (e) => {
         draggable: true,
         position: 'start',
         player: 0,
-        onDragStart: onDragStart2,
-        onDrop: onDrop2,
-        onSnapEnd: onSnapEnd2
+        onDragStart: onDragStart,
+        onDrop: onDropSp,
     }
     board = Chessboard('myBoard', config);
-
-    updateRemainingPlayers(game.remaining_players())
+    update()
 })
 
 //Connection will be established after webpage is refreshed
 const socket = io()
 
 //Triggers after a piece is dropped on the board
-function onDrop(source, target) {
-    source = squareAsArr(source);
-    target = squareAsArr(target);
+function onDropMp(source, target) {
+    let move = onDropCommon(source, target)
+    if (move === null) {
+        // illegal move
+        return 'snapback'
+    }
 
-    //emits event after piece is dropped
-    var room = formEl[1].value;
-    myAudioEl.play();
-    socket.emit('Dropped', { source, target, room })
+    // emits event after piece is dropped
+    let room = formEl[1].value;
+    socket.emit('MakeMove', { move, room })
 }
 
 socket.on('print', (msg) => {
@@ -155,62 +143,82 @@ function updateRemainingPlayers(remainingPlayers) {
     remainingPlayersEl.innerHTML = remPlayersHtml
 }
 
-//Catch Display event
-socket.on('DisplayBoard', (position, userId, socketIdToPlayer, remainingPlayers, turn) => {
-    // save scroll position then restore it after rebuilding the board
-    let tempScrollTop = $(window).scrollTop();
+// set up board
+socket.on('SetupBoard', (socketIdToPlayer) => {
+    messageEl.textContent = 'Match Started!! Best of Luck...'
+    config.player = socketIdToPlayer[socket.id];
+    console.log('assigned player id ', config.player)
+    document.getElementById('joinFormDiv').style.display = "none";
+    document.querySelector('#chessGame').style.display = null
+    ChatEl.style.display = null
+    document.getElementById('statusPGN').style.display = null
 
-    //This is to be done initially only
-    if (userId != undefined) {
-        messageEl.textContent = 'Match Started!! Best of Luck...'
-        config.player = socketIdToPlayer[socket.id];
-        console.log('assigned player id ', config.player)
-        document.getElementById('joinFormDiv').style.display = "none";
-        document.querySelector('#chessGame').style.display = null
-        ChatEl.style.display = null
-        document.getElementById('statusPGN').style.display = null
-    }
-
-    console.assert('player' in config);
-    config.position = position
-    if (turn == config.player) {
-        config.draggable = true;
-    } else {
-        config.draggable = false;
-    }
+    // config.position = position
+    // if (turn == config.player) {
+    //     config.draggable = true;
+    // } else {
+    //     config.draggable = false;
+    // }
     board = ChessBoard('myBoard', config)
+    update()
 
-    if (typeof remainingPlayers !== 'undefined') {
-        updateRemainingPlayers(remainingPlayers)
-    }
-
-    $(window).scrollTop(tempScrollTop);
+    // if (typeof remainingPlayers !== 'undefined') {
+    //     updateRemainingPlayers(remainingPlayers)
+    // }
 })
 
-//To Update Status Element
-socket.on('updateStatus', (turn) => {
-    let res;
-    if (turn == board.player()) {
-        res = "Your turn";
-    }
-    else {
-        res = "Player " + turn + "'s turn";
-    }
-    res += ' (' + genPlayerImgHtml(turn, '25px', 'margin-bottom: -5px;') + ')';
-    statusEl.innerHTML = res;
-})
+function update() {
+    let turn = game.turn()
 
-//If in check
-socket.on('inCheck', turn => {
-    let res;
     if (turn == board.player()) {
-        res = "You are in Check!!"
+        board.set_draggable(true)
+    } else {
+        board.set_draggable(false)
     }
-    else {
-        res = "Player " + board.player() + " is in Check!!"
+
+    let res;
+    if (game.in_check()) {
+        let res;
+        if (turn == board.player()) {
+            res = "You are in Check!"
+        }
+        else {
+            res = "Player " + board.player() + " is in Check!"
+        }
+        res += ' (' + genPlayerImgHtml(turn, '25px', 'margin-bottom: -5px;') + ')';
+        statusEl.innerHTML = res;
+    } else {
+        if (turn == board.player()) {
+            res = "Your turn";
+        }
+        else {
+            res = "Player " + turn + "'s turn";
+        }
+        res += ' (' + genPlayerImgHtml(turn, '25px', 'margin-bottom: -5px;') + ')';
     }
-    res += ' (' + genPlayerImgHtml(turn, '25px', 'margin-bottom: -5px;') + ')';
     statusEl.innerHTML = res;
+
+    updateRemainingPlayers(game.remaining_players())
+
+    let players = game.remaining_players()
+    if (players.length === 1 && players[0] === board.player()) {
+        alert('You won!')
+        return false
+    } else if (players.indexOf(board.player()) === -1) {
+        alert('You lost!')
+        return false
+    } else if (game.in_stalemate()) {
+        alert('You lost by stalemate!')
+        return false
+    }
+
+}
+
+socket.on('MakeMove', (player, move) => {
+    // if it's this player's turn, then they've already made the move locally
+    if (player !== board.player()) {
+        console.assert(makeMove(move))
+    }
 })
 
 //If win or draw
@@ -334,9 +342,9 @@ multiPlayerEl.addEventListener('click', (e) => {
     //Clients just have to diaplay the game
     config = {
         draggable: false,   //Initially
-        // position: 'start',
+        position: 'start',
         onDragStart: onDragStart,
-        onDrop: onDrop,
+        onDrop: onDropMp,
     }
     // var board = ChessBoard('myBoard', config)
 })
@@ -419,11 +427,11 @@ document.getElementById('messageBox').addEventListener('click', e => {
 // AUTOMATION
 //
 
-// // set player name
-// $(formEl[0]).val('ayy' + Math.random().toString().substring(2, 6));
-// // set room name
-// $(formEl[1]).val('commit');
-// multiPlayerEl.click()
-// joinButtonEl.click()
+// set player name
+$(formEl[0]).val('ayy' + Math.random().toString().substring(2, 6));
+// set room name
+$(formEl[1]).val('commit');
+multiPlayerEl.click()
+joinButtonEl.click()
 
-singlePlayerEl.click()
+// singlePlayerEl.click()

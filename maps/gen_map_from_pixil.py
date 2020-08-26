@@ -1,10 +1,11 @@
 import base64
 import json
+import sys
 
-with open('8-player-arena.pixil') as f:
+assert len(sys.argv) == 2
+
+with open(sys.argv[1]) as f:
     pixil = json.load(f)
-
-# layers = pixil['frames'][0]
 
 width = int(pixil['width'])
 height = int(pixil['height'])
