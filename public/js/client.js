@@ -17,6 +17,7 @@ let config = {};
 let board = null;
 let game = new Chess()
 let playerToName = null;
+let socketIdToPlayer = null;
 
 function getPlayerId(player) {
     if (playerToName == null) {
@@ -80,9 +81,11 @@ function makeMove(move) {
         console.log('updating board position')
         board.position(game.currentPosition(), true, move);
     }
-    myAudioEl.play().catch(function() {
-        console.log("couldn't play move tone")
-    });
+    if (!document.hidden) {
+        myAudioEl.play().catch(function() {
+            console.log("couldn't play move tone")
+        });
+    }
     update();
     return move_res
 }
@@ -204,9 +207,10 @@ function updateRemainingPlayers(remainingPlayers) {
 }
 
 // set up board
-socket.on('SetupBoard', (socketIdToPlayer, _playerToName) => {
+socket.on('SetupBoard', (_socketIdToPlayer, _playerToName) => {
     messageEl.textContent = 'Match Started!! Best of Luck...'
     playerToName = _playerToName
+    socketIdToPlayer = _socketIdToPlayer
     config.player = socketIdToPlayer[socket.id];
     console.log('assigned player id ', config.player)
     document.getElementById('joinFormDiv').style.display = "none";
@@ -214,18 +218,8 @@ socket.on('SetupBoard', (socketIdToPlayer, _playerToName) => {
     ChatEl.style.display = null
     document.getElementById('statusPGN').style.display = null
 
-    // config.position = position
-    // if (turn == config.player) {
-    //     config.draggable = true;
-    // } else {
-    //     config.draggable = false;
-    // }
     board = ChessBoard('myBoard', config)
     update()
-
-    // if (typeof remainingPlayers !== 'undefined') {
-    //     updateRemainingPlayers(remainingPlayers)
-    // }
 })
 
 function update() {
@@ -297,9 +291,12 @@ socket.on('gameOver', (turn, win) => {
 })
 
 //Client disconnected in between
-socket.on('disconnectedStatus', () => {
-    alert('Opponent left the game!!')
-    messageEl.textContent = 'Opponent left the game!!'
+socket.on('disconnectedStatus', (socketId) => {
+    let player = socketIdToPlayer[socketId]
+    let name = playerToName[player]
+    let msg = `Opponent ${name} left the game!!`
+    alert(msg)
+    messageEl.textContent = msg
 })
 
 //Receiving a message
@@ -315,9 +312,11 @@ socket.on('receiveMessage', (user, message) => {
     else {
         divEl.classList.add('youMessage');
         divEl.textContent = message;
-        document.getElementById('messageTone').play().catch(function() {
-            console.log("couldn't play message tone")
-        });
+        if (!document.hidden) {
+            document.getElementById('messageTone').play().catch(function() {
+                console.log("couldn't play message tone")
+            });
+        }
     }
     var style = window.getComputedStyle(document.getElementById('chatBox'));
     if (style.display === 'none') {

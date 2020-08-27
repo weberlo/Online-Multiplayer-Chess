@@ -178,7 +178,7 @@ io.on('connection', (socket) => {
         // }
         gameData.delete(socket.id)
         if (user != '' && room != '') {
-            io.to(room).emit('disconnectedStatus');
+            io.to(room).emit('disconnectedStatus', socket.id);
         }
     })
 })
