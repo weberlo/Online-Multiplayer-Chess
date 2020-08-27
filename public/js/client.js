@@ -196,13 +196,13 @@ socket.on('print', (msg) => {
 })
 
 function genPlayerImgHtml(player, size='25px', style='') {
-  return `<img src='img/chesspieces/${player}/k.png' width='${size}' height='${size}' style='${style}' />`
+  return `<img src='img/chesspieces/${player}/k.png' width='${size}' height='${size}' style='margin-left: -2px; margin-right: -2px; ${style}' />`
 }
 
 function updateRemainingPlayers(remainingPlayers) {
     let remPlayersHtml = remainingPlayers.map(
-        player => genPlayerImgHtml(player, '30px'))
-        .join(', ');
+        player => getPlayerId(player) + ' (' + genPlayerImgHtml(player, '25px', 'margin-bottom: -5px;') + ')')
+        .join(',&nbsp; &nbsp;');
     remainingPlayersEl.innerHTML = remPlayersHtml
 }
 
