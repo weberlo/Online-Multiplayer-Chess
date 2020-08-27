@@ -945,6 +945,7 @@
         duration: config.moveSpeed,
         complete: onFinishAnimation1
       }
+      debugger
       $animatedPiece.animate(destSquarePosition, opts)
     }
 
@@ -993,6 +994,7 @@
 
       var numFinished = 0
       function onFinishAnimation3 () {
+        debugger
         // exit if all the animations aren't finished
         numFinished = numFinished + 1
         if (numFinished !== animations.length) return
