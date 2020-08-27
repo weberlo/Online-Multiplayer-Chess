@@ -220,7 +220,6 @@
 
   // returns the distance between two squares
   function squareDistance (squareA, squareB) {
-    debugger;
     var squareAArray = squareA.split('')
     var squareAx = COLUMN_IDS.indexOf(squareAArray[0]) + 1
     var squareAy = parseInt(squareAArray[1], 10)
@@ -256,7 +255,6 @@
 
   // returns an array of closest squares from square
   function createRadius (square) {
-    debugger;
     var squares = []
 
     // calculate distance of all squares
@@ -1128,7 +1126,7 @@
       return newPos
     }
 
-    widget.position = function (position, useAnimation) {
+    widget.position = function (position, useAnimation, move) {
       // no arguments, return the current position
       if (arguments.length === 0) {
         return deepCopy(currentPosition)
@@ -1140,8 +1138,7 @@
       }
 
       // default for useAnimations is true
-      // if (useAnimation !== false) useAnimation = true
-      useAnimation = false
+      if (useAnimation !== false) useAnimation = true
 
       if (num_rows() != position.length || num_cols() != position[0].length) {
         // completely rebuild board
@@ -1151,7 +1148,19 @@
 
       } else if (useAnimation) {
         // start the animations
-        var animations = calculateAnimations(currentPosition, position)
+        let animations;
+        if (typeof move !== 'undefined') {
+          animations = [{
+            type: 'move',
+            source: move.from[0] + '-' + move.from[1],
+            destination: move.to[0] + '-' + move.to[1],
+            piece: move.piece + move.player,
+          }]
+        } else {
+          // NOTE board diffing is for scrubs
+          console.assert(false)
+          let animations = calculateAnimations(currentPosition, position)
+        }
         doAnimations(animations, currentPosition, position)
 
         // set the new position

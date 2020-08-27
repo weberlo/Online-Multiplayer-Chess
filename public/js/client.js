@@ -73,8 +73,12 @@ function sleep(ms) {
 
 function makeMove(move) {
     // see if the move is legal
+    let turn = game.turn()
     let move_res = game.move(move)
-    board.position(game.currentPosition());
+    if (turn != board.player()) {
+        // don't need to update the board if we're the one who made the move
+        board.position(game.currentPosition(), true, move);
+    }
     myAudioEl.play();
     update();
     return move_res
@@ -190,15 +194,13 @@ function update() {
 
     let res;
     if (game.in_check()) {
-        let res;
         if (turn == board.player()) {
-            res = "You are in Check!"
+            res = "You are in check!"
         }
         else {
-            res = getPlayerId(turn) + " is in Check!"
+            res = getPlayerId(turn) + " is in check!"
         }
         res += ' (' + genPlayerImgHtml(turn, '25px', 'margin-bottom: -5px;') + ')';
-        statusEl.innerHTML = res;
     } else {
         if (turn == board.player()) {
             res = "Your turn";
@@ -439,11 +441,11 @@ document.getElementById('messageBox').addEventListener('click', e => {
 // AUTOMATION
 //
 
-// // set player name
-// $(formEl[0]).val('ayy' + Math.random().toString().substring(2, 6));
-// // set room name
-// $(formEl[1]).val('commit');
-// multiPlayerEl.click()
-// joinButtonEl.click()
+// set player name
+$(formEl[0]).val('ayy' + Math.random().toString().substring(2, 6));
+// set room name
+$(formEl[1]).val('commit');
+multiPlayerEl.click()
+joinButtonEl.click()
 
-singlePlayerEl.click()
+// singlePlayerEl.click()
