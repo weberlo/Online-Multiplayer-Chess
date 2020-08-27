@@ -12,9 +12,20 @@ const multiPlayerEl = document.getElementById('multiPlayer');
 const totalRoomsEl = document.getElementById('rooms')
 const totalPlayersEl = document.getElementById('players')
 const chatContentEl = document.getElementById('chatContent')
-var config = {};
-var board = null;
-var game = new Chess()
+
+let config = {};
+let board = null;
+let game = new Chess()
+let playerToName = null;
+
+function getPlayerId(player) {
+    if (playerToName == null) {
+        return `Player ${player}`
+    } else {
+        console.assert(player in playerToName)
+        return playerToName[player]
+    }
+}
 
 // initializing semantic UI dropdown
 $('.ui.dropdown')
@@ -144,8 +155,9 @@ function updateRemainingPlayers(remainingPlayers) {
 }
 
 // set up board
-socket.on('SetupBoard', (socketIdToPlayer) => {
+socket.on('SetupBoard', (socketIdToPlayer, _playerToName) => {
     messageEl.textContent = 'Match Started!! Best of Luck...'
+    playerToName = _playerToName
     config.player = socketIdToPlayer[socket.id];
     console.log('assigned player id ', config.player)
     document.getElementById('joinFormDiv').style.display = "none";
@@ -183,7 +195,7 @@ function update() {
             res = "You are in Check!"
         }
         else {
-            res = "Player " + board.player() + " is in Check!"
+            res = getPlayerId(turn) + " is in Check!"
         }
         res += ' (' + genPlayerImgHtml(turn, '25px', 'margin-bottom: -5px;') + ')';
         statusEl.innerHTML = res;
@@ -192,7 +204,7 @@ function update() {
             res = "Your turn";
         }
         else {
-            res = "Player " + turn + "'s turn";
+            res = getPlayerId(turn) + "'s turn";
         }
         res += ' (' + genPlayerImgHtml(turn, '25px', 'margin-bottom: -5px;') + ')';
     }
@@ -427,11 +439,11 @@ document.getElementById('messageBox').addEventListener('click', e => {
 // AUTOMATION
 //
 
-// set player name
-$(formEl[0]).val('ayy' + Math.random().toString().substring(2, 6));
-// set room name
-$(formEl[1]).val('commit');
-multiPlayerEl.click()
-joinButtonEl.click()
+// // set player name
+// $(formEl[0]).val('ayy' + Math.random().toString().substring(2, 6));
+// // set room name
+// $(formEl[1]).val('commit');
+// multiPlayerEl.click()
+// joinButtonEl.click()
 
-// singlePlayerEl.click()
+singlePlayerEl.click()

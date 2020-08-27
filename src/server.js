@@ -95,7 +95,12 @@ io.on('connection', (socket) => {
         roomPlayerCounters[room]++;
         socketIdToPlayer[socket.id] = player;
 
-        userData[user + "" + socket.id] = {
+        // userData[user + "" + socket.id] = {
+        //     room, user,
+        //     id: socket.id,
+        //     player,
+        // }
+        userData[socket.id] = {
             room, user,
             id: socket.id,
             player,
@@ -117,9 +122,14 @@ io.on('connection', (socket) => {
             for (var x in io.nsps['/'].adapter.rooms[room].sockets) {
                 gameData[x] = game
             }
-            //For giving turns one by one
-            io.to(room).emit('SetupBoard', socketIdToPlayer)
-            // updateStatus(game, room)
+            let playerToName = {}
+            for (let sockId in userData) {
+                let entry = userData[sockId]
+                if (entry.room == room) {
+                    playerToName[entry.player] = entry.user
+                }
+            }
+            io.to(room).emit('SetupBoard', socketIdToPlayer, playerToName)
         }
     })
 
@@ -127,24 +137,13 @@ io.on('connection', (socket) => {
     socket.on('MakeMove', ({ move, room }) => {
         let game = gameData[socket.id]
         let eventPlayer = socketIdToPlayer[socket.id];
-        console.assert(game.turn() == eventPlayer)
-        let move_res = game.move(move)
-        console.assert(move_res != null)
-        // if (move == null) {
-        //     io.to(room).emit('print', `player ${eventPlayer} made an INVALID move`)
-        // } else {
-        //     io.to(room).emit('print', `player ${eventPlayer} made a move`)
-        //     io.to(room).emit('print', `it is now player ${game.turn()}'s turn`)
-        // }
-        // } else {
-        //     io.to(room).emit('print', `player ${eventPlayer} attempted to move during player ${game.turn()}'s turn`)
-        // }
 
-        // still update the board, even if no move was made on the server-side,
-        // since the client-side won't correct itself on incorrect moves
-        // TODO make the client-side correct itself
+        // NOTE uncomment for server-side checking
+        // console.assert(game.turn() == eventPlayer)
+        // let move_res = game.move(move)
+        // console.assert(move_res != null)
+
         io.to(room).emit('MakeMove', eventPlayer, move)
-        // updateStatus(game, room)
     })
 
     //Catching message event
@@ -164,17 +163,17 @@ io.on('connection', (socket) => {
                 delete userData[x]
             }
         }
-        //Rooms Removed
-        if (userData[room] == null) {
-            //Rooms List Delete
-            roomsList.delete(room);
-            io.emit('roomsList', Array.from(roomsList));
-            totalRooms = roomsList.length
-            io.emit('totalRooms', totalRooms)
-            if (room in roomPlayerCounters) {
-                delete roomPlayerCounters[room]
-            }
-        }
+        // //Rooms Removed
+        // if (userData[room] == null) {
+        //     //Rooms List Delete
+        //     roomsList.delete(room);
+        //     io.emit('roomsList', Array.from(roomsList));
+        //     totalRooms = roomsList.length
+        //     io.emit('totalRooms', totalRooms)
+        //     if (room in roomPlayerCounters) {
+        //         delete roomPlayerCounters[room]
+        //     }
+        // }
         gameData.delete(socket.id)
         if (user != '' && room != '') {
             io.to(room).emit('disconnectedStatus');
