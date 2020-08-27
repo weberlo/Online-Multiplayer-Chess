@@ -1161,10 +1161,9 @@
           console.assert(false)
           let animations = calculateAnimations(currentPosition, position)
         }
-        doAnimations(animations, currentPosition, position)
-
         // set the new position
         setCurrentPosition(position)
+        doAnimations(animations, currentPosition, position)
       } else {
         // instant update
         setCurrentPosition(position)
@@ -1297,19 +1296,15 @@
       if (!isFunction(config.onMouseoverSquare)) return
 
       // get the square
-      var square = $(evt.currentTarget).attr('data-square')
+      let square = $(evt.currentTarget).attr('data-square')
 
-      // NOTE: this should never happen; defensive
-      if (!validSquare(square)) return
-
+      let [row, col] = squareAsArr(square)
       // get the piece on this square
-      var piece = false
-      if (currentPosition.hasOwnProperty(square)) {
-        piece = currentPosition[square]
+      let piece = currentPosition[row][col]
+      if (piece != '') {
+        // execute their function
+        config.onMouseoverSquare(square, piece, deepCopy(currentPosition))
       }
-
-      // execute their function
-      config.onMouseoverSquare(square, piece, deepCopy(currentPosition))
     }
 
     function mouseleaveSquare (evt) {
@@ -1321,19 +1316,15 @@
       if (!isFunction(config.onMouseoutSquare)) return
 
       // get the square
-      var square = $(evt.currentTarget).attr('data-square')
+      let square = $(evt.currentTarget).attr('data-square')
 
-      // NOTE: this should never happen; defensive
-      if (!validSquare(square)) return
-
+      let [row, col] = squareAsArr(square)
       // get the piece on this square
-      var piece = false
-      if (currentPosition.hasOwnProperty(square)) {
-        piece = currentPosition[square]
+      let piece = currentPosition[row][col]
+      if (piece != '') {
+        // execute their function
+        config.onMouseoutSquare(square, piece, deepCopy(currentPosition))
       }
-
-      // execute their function
-      config.onMouseoutSquare(square, piece, deepCopy(currentPosition))
     }
 
     // -------------------------------------------------------------------------

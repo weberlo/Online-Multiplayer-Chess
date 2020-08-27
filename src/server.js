@@ -137,6 +137,8 @@ io.on('connection', (socket) => {
     socket.on('MakeMove', ({ move, room }) => {
         let game = gameData[socket.id]
         let eventPlayer = socketIdToPlayer[socket.id];
+        console.log('incoming MakeMove event (player =', eventPlayer, '), move: ')
+        console.log(move)
 
         // NOTE uncomment for server-side checking
         // console.assert(game.turn() == eventPlayer)

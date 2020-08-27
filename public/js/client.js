@@ -77,9 +77,12 @@ function makeMove(move) {
     let move_res = game.move(move)
     if (turn != board.player()) {
         // don't need to update the board if we're the one who made the move
+        console.log('updating board position')
         board.position(game.currentPosition(), true, move);
     }
-    myAudioEl.play();
+    myAudioEl.play().catch(function() {
+        console.log("couldn't play move tone")
+    });
     update();
     return move_res
 }
@@ -108,7 +111,46 @@ function onDropSp(source, target) {
         // illegal move
         return 'snapback'
     }
+    removeGreySquares()
     makeCpuMovesSp()
+
+}
+
+const whiteSquareGrey = '#a9a9a9'
+const blackSquareGrey = '#696969'
+
+function removeGreySquares () {
+  $('#myBoard .square-55d63').css('background', '')
+}
+
+function greySquare (square) {
+  var $square = $('#myBoard .square-' + square)
+
+  var background = whiteSquareGrey
+  if ($square.hasClass('black-3c85d')) {
+    background = blackSquareGrey
+  }
+
+  $square.css('background', background)
+}
+
+function onMouseoverSquare(square, piece) {
+    if (game.turn() != board.player() || piece[1] != board.player()) return
+
+    let [row, col] = squareAsArr(square)
+    let moves = game.moves_single(game.turn(), row, col, /* legal */ true)
+    // highlight the square they moused over
+    greySquare(square)
+
+    // highlight the possible squares for this piece
+    for (let i = 0; i < moves.length; i++) {
+        let [row, col] = moves[i].to
+        greySquare(row + '-' + col)
+    }
+}
+
+function onMouseoutSquare (square, piece) {
+    removeGreySquares()
 }
 
 singlePlayerEl.addEventListener('click', (e) => {
@@ -122,6 +164,8 @@ singlePlayerEl.addEventListener('click', (e) => {
         player: 0,
         onDragStart: onDragStart,
         onDrop: onDropSp,
+        onMouseoverSquare: onMouseoverSquare,
+        onMouseoutSquare: onMouseoutSquare,
     }
     board = Chessboard('myBoard', config);
     update()
@@ -137,6 +181,7 @@ function onDropMp(source, target) {
         // illegal move
         return 'snapback'
     }
+    removeGreySquares()
 
     // emits event after piece is dropped
     let room = formEl[1].value;
@@ -229,6 +274,7 @@ function update() {
 }
 
 socket.on('MakeMove', (player, move) => {
+    console.log(`receiving MakeMove (player = ${player}; move = ${move})`)
     // if it's this player's turn, then they've already made the move locally
     if (player !== board.player()) {
         console.assert(makeMove(move))
@@ -269,7 +315,9 @@ socket.on('receiveMessage', (user, message) => {
     else {
         divEl.classList.add('youMessage');
         divEl.textContent = message;
-        document.getElementById('messageTone').play();
+        document.getElementById('messageTone').play().catch(function() {
+            console.log("couldn't play message tone")
+        });
     }
     var style = window.getComputedStyle(document.getElementById('chatBox'));
     if (style.display === 'none') {
@@ -302,7 +350,7 @@ socket.on('roomsList', (rooms) => {
 })
 
 socket.on('updateTotalUsers', totalUsers => {
-    console.log('event listened')
+    console.log('total users now', totalUsers)
     totalPlayersEl.innerHTML = totalUsers;
 })
 
@@ -359,22 +407,31 @@ multiPlayerEl.addEventListener('click', (e) => {
         position: 'start',
         onDragStart: onDragStart,
         onDrop: onDropMp,
+        onMouseoverSquare: onMouseoverSquare,
+        onMouseoutSquare: onMouseoutSquare,
     }
     // var board = ChessBoard('myBoard', config)
 })
 
-const applyColorScheme = (black, white) => {
-    const blackEl = document.querySelectorAll('.black-3c85d');
-    for (var i = 0; i < blackEl.length; i++) {
-        blackEl[i].style.backgroundColor = black;
-        blackEl[i].style.color = white;
-    }
-    const whiteEl = document.querySelectorAll('.white-1e1d7');
-    for (var i = 0; i < whiteEl.length; i++) {
-        whiteEl[i].style.backgroundColor = white;
-        whiteEl[i].style.color = black;
-    }
-}
+// const BLACK_BG = "#E1E1E1"
+// const WHITE_BG = "#FFFFFF"
+
+// const BLACK_BG = "#D18B47"
+// const WHITE_BG = "#FFCE9E"
+
+// const applyColorScheme = (black, white) => {
+//     const blackEl = document.querySelectorAll('.black-3c85d');
+//     for (var i = 0; i < blackEl.length; i++) {
+//         blackEl[i].style.backgroundColor = BLACK_BG;
+//         blackEl[i].style.color = WHITE_BG;
+//     }
+//     const whiteEl = document.querySelectorAll('.white-1e1d7');
+//     for (var i = 0; i < whiteEl.length; i++) {
+//         whiteEl[i].style.backgroundColor = WHITE_BG;
+//         whiteEl[i].style.color = BLACK_BG;
+//     }
+// }
+// applyColorScheme(BLACK_BG, WHITE_BG)
 
 //For removing class from all buttons
 const removeClass = () => {
@@ -385,46 +442,46 @@ const removeClass = () => {
     }
 }
 
-// Color Buttons
-document.getElementById('grey_board').addEventListener('click', e => {
-    e.preventDefault();
-    removeClass();
-    document.getElementById('grey_board').classList.add('black');
-    document.getElementById('orange_board').classList.add('grey');
-    document.getElementById('green_board').classList.add('grey');
-    document.getElementById('blue_board').classList.add('grey');
-    applyColorScheme("#E1E1E1", "#FFFFFF");
-})
+// // Color Buttons
+// document.getElementById('grey_board').addEventListener('click', e => {
+//     e.preventDefault();
+//     removeClass();
+//     document.getElementById('grey_board').classList.add('black');
+//     document.getElementById('orange_board').classList.add('grey');
+//     document.getElementById('green_board').classList.add('grey');
+//     document.getElementById('blue_board').classList.add('grey');
+//     applyColorScheme("#E1E1E1", "#FFFFFF");
+// })
 
-document.getElementById('orange_board').addEventListener('click', e => {
-    e.preventDefault();
-    removeClass();
-    document.getElementById('grey_board').classList.add('grey');
-    document.getElementById('orange_board').classList.add('black');
-    document.getElementById('green_board').classList.add('grey');
-    document.getElementById('blue_board').classList.add('grey');
-    applyColorScheme("#D18B47", "#FFCE9E");
-})
+// document.getElementById('orange_board').addEventListener('click', e => {
+//     e.preventDefault();
+//     removeClass();
+//     document.getElementById('grey_board').classList.add('grey');
+//     document.getElementById('orange_board').classList.add('black');
+//     document.getElementById('green_board').classList.add('grey');
+//     document.getElementById('blue_board').classList.add('grey');
+//     applyColorScheme("#D18B47", "#FFCE9E");
+// })
 
-document.getElementById('green_board').addEventListener('click', e => {
-    e.preventDefault();
-    removeClass();
-    document.getElementById('grey_board').classList.add('grey');
-    document.getElementById('orange_board').classList.add('grey');
-    document.getElementById('green_board').classList.add('black');
-    document.getElementById('blue_board').classList.add('grey');
-    applyColorScheme("#58AC8A", "#FFFFFF");
-})
+// document.getElementById('green_board').addEventListener('click', e => {
+//     e.preventDefault();
+//     removeClass();
+//     document.getElementById('grey_board').classList.add('grey');
+//     document.getElementById('orange_board').classList.add('grey');
+//     document.getElementById('green_board').classList.add('black');
+//     document.getElementById('blue_board').classList.add('grey');
+//     applyColorScheme("#58AC8A", "#FFFFFF");
+// })
 
-document.getElementById('blue_board').addEventListener('click', e => {
-    e.preventDefault();
-    removeClass();
-    document.getElementById('grey_board').classList.add('grey');
-    document.getElementById('orange_board').classList.add('grey');
-    document.getElementById('green_board').classList.add('grey');
-    document.getElementById('blue_board').classList.add('black');
-    applyColorScheme("#727FA2", "#C3C6BE");
-})
+// document.getElementById('blue_board').addEventListener('click', e => {
+//     e.preventDefault();
+//     removeClass();
+//     document.getElementById('grey_board').classList.add('grey');
+//     document.getElementById('orange_board').classList.add('grey');
+//     document.getElementById('green_board').classList.add('grey');
+//     document.getElementById('blue_board').classList.add('black');
+//     applyColorScheme("#727FA2", "#C3C6BE");
+// })
 
 // Messages Modal
 document.getElementById('messageBox').addEventListener('click', e => {
