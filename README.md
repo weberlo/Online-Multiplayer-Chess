@@ -27,8 +27,8 @@ then run `open_tunnel.sh` in this repo.  It'll spit out a link you can share wit
 Gonna be honest.  The code is straight-up garbage.  Inconsistent style.  Stringly-typed.  Trusts clients and uses the server as a move router.  Y'know.  The works.
 
 That being said, if you're willing to trudge through, these are the most important files:
-- [chess.js](https://github.com/weberlo/commit-chess/blob/master/node_modules/chess.js/chess.js): The implementation of M-player, NxN chess.
-- [chessboard.js](https://github.com/weberlo/commit-chess/blob/master/public/js/chessboard.js): The visual counterpart to [chess.js](./node_modules/chess.js/chess.js). Handles board rendering, piece dragging, piece animation, move highlighting, etc.
+- [chess.js](./node_modules/chess.js/chess.js): The implementation of M-player, NxN chess.
+- [chessboard.js](./public/js/chessboard.js): The visual counterpart to [chess.js](./node_modules/chess.js/chess.js). Handles board rendering, piece dragging, piece animation, move highlighting, etc.
 - [client.js](./public/js/client.js): Facilitates single-player games and handles the client code for multi-player games.
 - [server.js](./src/server.js): Keeps track of connected users and how many users are in a room.  Broadcasts moves and messages from each client to the other clients.
 
