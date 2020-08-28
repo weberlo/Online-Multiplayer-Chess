@@ -90,8 +90,8 @@ python gen_map_from_pixel.py 8-player-arena-v3.pixil
 ```
 
 ## Limitations/TODOs
-- There's no support for rejoining games
-- The 8-player map needs a smaller variant, so it doesn't take so long for the game to get interesting
+- There's no support for rejoining games, so if you accidentally disconnect, the game's pretty much toast.  :(
+- The 8-player map needs a smaller variant, so it doesn't take so long for the game to get interesting.
 - With >2 players, some kind of move timer would help speed up the game.  The idea would be that when the time goes out, the player is forced to make a random move.  Start it at 5-10 seconds, then as more players are eliminated, give more time to the remaining players.
 
 ## Acknowledgements
