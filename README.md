@@ -25,6 +25,8 @@ To make your server accessible to the Internet,
 install [Localtunnel](https://localtunnel.github.io/www/),
 then run `open_tunnel.sh` in this repo.  It'll spit out a link you can share with friends.  Once enough players have joined (8 players in the default map), the match will automatically begin.
 
+There's a single-player mode, but the CPUs make random moves.  It's really there just to get a feel for the game.
+
 ## Code Walkthrough
 Gonna be honest.  The code is straight-up garbage.  Inconsistent style.  Stringly-typed.  Trusts clients and uses the server as a move router.  Y'know.  The works.
 
