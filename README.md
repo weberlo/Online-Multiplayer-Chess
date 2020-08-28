@@ -3,6 +3,8 @@
 
 It's `M`-player, `N`x`N` chess!  `M` and `N` are _theoretically_ arbitrary, but the code is a bit of a minefield, so theory may not meet practice here.  If you're willing to read a bit, maps are fully customizable.  It even has a messaging system, for some reason!<sup>1</sup>
 
+This was originally created for the [Commit group](http://groups.csail.mit.edu/commit/)'s daily Zoom hangout, but hopefully other chess fanatics find it a fun variant to play with friends.
+
 ## Design
 In this variant, there are some notable deviations from standard chess:
 - There's no castling
