@@ -105,6 +105,7 @@ io.on('connection', (socket) => {
             id: socket.id,
             player,
         }
+        console.log(user,'joined')
 
         if (io.nsps['/'].adapter.rooms[room]) {
             console.log(io.nsps['/'].adapter.rooms[room].length, "players in lobby");

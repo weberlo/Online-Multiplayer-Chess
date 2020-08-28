@@ -54,7 +54,7 @@ for layer in img_layers:
                 typ = LAYERS[layer_name]
                 board_set(i, j, f'{typ}{player}')
 
-print('[')
+print('const START_POSITION = [')
 for i in range(height):
     suffix = ','
     if i == height - 1:
